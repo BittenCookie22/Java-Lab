@@ -14,6 +14,12 @@ public class Kolumna {
         dane =  new ArrayList(10);
     }
 
+    public Kolumna(Kolumna do_skopiowania){  // konstruktor kopiujący porzebny do kopii głębokiej
+        nazwa = new String(do_skopiowania.nazwa);
+        typ = new String(do_skopiowania.typ);
+        dane = new ArrayList<>(do_skopiowania.dane);
+    }
+
     public void addElement(Object element){ // --> przenieść do DF
         if (element.getClass().toString() == typ){
             dane.add(element);

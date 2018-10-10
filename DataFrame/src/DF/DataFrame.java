@@ -26,6 +26,8 @@ public class DataFrame {
     }
 
 
+
+
     public int size() {
         //Kolumna tmp = kolumny[0];
         //return tmp.dane.size();
@@ -44,7 +46,7 @@ public class DataFrame {
         //Kolumna tmp  = kolumny[indeks];
         //return tmp;
         for (Kolumna i : kolumny) {
-            if (colname == i.nazwa) {  // --> szybszy sposób
+            if (i.nazwa.equals(colname)) {  // --> szybszy sposób
                 return i;
             }
         }
@@ -69,22 +71,19 @@ public class DataFrame {
         String[] nazwy = new String [kolumny.length]; //tablica na nazwy w nowej DF
 
         for (int i=0;i<kolumny.length;i++){ // wypełnianie tablic na podstawie starej DF
-            typy[i]= kolumny[i].typ;  // new String?
-            nazwy[i]=kolumny[i].nazwa;
+            typy[i]= new String (kolumny[i].typ);
+            nazwy[i]=new String (kolumny[i].nazwa);
         }
 
         DataFrame nowa_DF = new DataFrame(nazwy,typy); //nowa DF
-        Object[] nowe_wiersze = new Object[kolumny.length*(to-from+1)];  // inny zakres niz kolumny.lenght
+        Object[] nowe_wiersze = new Object[kolumny.length];
 
-        for (int i=from;i<to;i++){
-            for (Kolumna k:kolumny){   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
+        for (int i=from;i<=to;i++){
+            for (Kolumna k:this.kolumny){   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
                 nowe_wiersze[i]=k.dane.get(i);
             }
-        }
-
-        for (int j=0;j<nowe_wiersze.length;j++){
-            for (Kolumna m:nowa_DF.kolumny){ //wstawanienie danych z nowych wierszy do pola Kolumny w nowej DF
-                m.dane.add(nowe_wiersze[j]);
+            for (int j=0;j<nowe_wiersze.length;j++){  //wstawanienie danych z nowych wierszy do pola Kolumny w nowej DF
+                    nowa_DF.kolumny[j].dane.add(nowe_wiersze[j]);
             }
         }
         return nowa_DF;
@@ -94,7 +93,21 @@ public class DataFrame {
         return iloc(i,i);
     }
 
+    public DataFrame get(String[] cols,boolean copy){ // zwraca nową DataFrame z kolumnami podanymi jako parametry.W zależności od wartości parametru copy albo tworzona jest głęboka kopia, albo płytka.
+        Kolumna[] nowe_kolumny = new Kolumna[cols.length];
+
+        for(int i=0;i<cols.length;i++) {
+            if (copy){ //gleboka
+                nowe_kolumny[i] = new Kolumna(get(cols[i]));}
+            else {//plytka
+                nowe_kolumny[i] = get(cols[i]);}
+        }
+        DataFrame nowa_DF = new DataFrame(nowe_kolumny);
+        return nowa_DF;
+    }
 }
+// głeboka -> towrzymy nowy obiekt z tą samą zawartości ale innym adresem w pamięci, zmiana w obj 1 nie powoduje zmiany w obj 2
+//płytka -> nowy obiekt ale wskazujacy na ten sam adres w pamięci, zmiana w obj1 powoduje zmiane w obj2
 
 
 
