@@ -20,13 +20,5 @@ public class Kolumna {
         dane = new ArrayList<>(do_skopiowania.dane);
     }
 
-    public void addElement(Object element){ // --> przenieść do DF
-        if (element.getClass().toString() == typ){
-            dane.add(element);
-        }
-        else {
-            System.out.println("zły typ danych, nie psauje do tej kolmumny");}
-
-    }
 
 }
