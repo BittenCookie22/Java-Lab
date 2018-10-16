@@ -6,14 +6,35 @@ import java.util.NoSuchElementException;
 public class DataFrame {
     Kolumna[] kolumny;
     int ilosc_wierszy;
+    String [] lista_nazw;
+    TmpTypDanych [] lista_typow;
 
-    public DataFrame(String[] lista_nazw, String[] lista_typow) {
+
+
+    public void konstruktorZwyczajny(String[] lista_nazw, TmpTypDanych[] lista_typow) {
         kolumny = new Kolumna[lista_typow.length];
         for (int i = 0; i < lista_typow.length; i++) {
             kolumny[i] = new Kolumna(lista_nazw[i], lista_typow[i]);
         }
         ilosc_wierszy = 0; // na początku brak danych == brak wierszy
     }
+
+    public  DataFrame(String[] lista_nazw, TmpTypDanych[] lista_typow){
+        this.lista_typow=lista_typow;
+        this.lista_nazw=lista_nazw;
+
+        konstruktorZwyczajny(lista_nazw,lista_typow);
+    }
+
+    public DataFrame(String[] lista_nazw, String[] lista_typow){
+        TmpTypDanych[] typy = new TmpTypDanych[lista_typow.length];
+        for(int i=0;i<lista_typow.length;i++){
+            typy[i]=TmpTypDanych.zwrocTypDanej(lista_typow[i]);
+        }
+        konstruktorZwyczajny(lista_nazw,typy);
+
+    }
+
 
     public DataFrame(Kolumna[] kolumny) {
         this.kolumny = kolumny;
@@ -26,27 +47,27 @@ public class DataFrame {
     }
 
 
+    public void dodajElement(Object[] elementy){
+        if(elementy.length!=kolumny.length){
+            throw new RuntimeException("blad");
+        }
+        int i=0;
+        ilosc_wierszy++;
+        for (Kolumna kol:this.kolumny){
+            kol.dodaj(elementy[i++]);
+        }
+    }
+
+
 
 
     public int size() {
-        //Kolumna tmp = kolumny[0];
-        //return tmp.dane.size();
-        return ilosc_wierszy; // --> szybszy sposób
+        return ilosc_wierszy;
     }
 
     public Kolumna get(String colname) {//zwracającą kolumnę o podanej nazwie
-        //int indeks=0;
-        //int licznik = 0;
-        //for (Kolumna x: kolumny){
-        //   if (x.nazwa == colname){
-        //      indeks = licznik;
-        // }
-        // else{licznik++;}
-        // }
-        //Kolumna tmp  = kolumny[indeks];
-        //return tmp;
         for (Kolumna i : kolumny) {
-            if (i.nazwa.equals(colname)) {  // --> szybszy sposób
+            if (i.nazwa.equals(colname)) {
                 return i;
             }
         }
@@ -71,7 +92,7 @@ public class DataFrame {
         String[] nazwy = new String [kolumny.length]; //tablica na nazwy w nowej DF
 
         for (int i=0;i<kolumny.length;i++){ // wypełnianie tablic na podstawie starej DF
-            typy[i]= new String (kolumny[i].typ);
+            typy[i]= kolumny[i].typ.nazwa_typu;
             nazwy[i]=new String (kolumny[i].nazwa);
         }
 
@@ -82,10 +103,9 @@ public class DataFrame {
             for (Kolumna k:this.kolumny){   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
                 nowe_wiersze[i]=k.dane.get(i);
             }
-            for (int j=0;j<nowe_wiersze.length;j++){  //wstawanienie danych z nowych wierszy do pola Kolumny w nowej DF
-                    nowa_DF.kolumny[j].dane.add(nowe_wiersze[j]);
+            nowa_DF.dodajElement(nowe_wiersze);
             }
-        }
+
         return nowa_DF;
     }
 
