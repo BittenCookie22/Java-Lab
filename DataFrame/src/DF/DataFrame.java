@@ -72,7 +72,7 @@ public class DataFrame {
         return ilosc_wierszy;
     }
 
-    public Kolumna get(String colname) {//zwracającą kolumnę o podanej nazwie
+    public Kolumna get(String colname) {//zwraca kolumnę o podanej nazwie
         for (Kolumna i : kolumny) {
             if (i.nazwa.equals(colname)) {
                 return i;
