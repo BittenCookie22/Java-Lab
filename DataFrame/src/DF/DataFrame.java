@@ -59,7 +59,14 @@ public class DataFrame {
     }
 
 
+    public Object[] zwrocWiersz(int i){
+        Object[] wiersz=new Object[kolumny.length];
+        int j=0;
+        for(Kolumna k:kolumny)
+            wiersz[j++]=k.zwrocObiekt(i);
 
+        return wiersz;
+    }
 
     public int size() {
         return ilosc_wierszy;
