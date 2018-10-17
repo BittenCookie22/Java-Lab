@@ -3,7 +3,9 @@ package DF;
 import java.util.NoSuchElementException;
 
 public class SparseDataFrame extends DataFrame {
-    final class COOValue {  // przechowuje indeksy niezerowych elementów i ich wartość
+
+// ----------------COOValue - (immutable) przechowuje indeksy niezerowych elementów i ich wartość------------------
+    final class COOValue {
         private final Object wartosc;
         private final int indeks;
 
@@ -21,7 +23,7 @@ public class SparseDataFrame extends DataFrame {
         }
     }
 
-//--------------------------------------------------
+//----------------SparseKolumna - specjalna kolumna dla SprsDF, przechowuje info o tym jaki obiekt ukrywać (hide) i ilość wierszy w kolumnie---------------------------------------------------------------------------
 
     public class SparseKolumna extends Kolumna {
         Object hide;
@@ -42,13 +44,13 @@ public class SparseDataFrame extends DataFrame {
         @Override
         public void dodaj(Object element){
             boolean check = hide.equals(element);
-            if (check==false){
+            if (check==false){ //jesli obiekt nie jest hide to dodajemy do kolumny
                 super.dodaj(new COOValue(element,ilosc_wierszy));
             }
             ilosc_wierszy++;
         }
     }
-    //--------------------------------------------------
+    //--------------Konstruktory SparseDataFrame------------------------------------
 
     public SparseDataFrame(String[] lista_nazw, TmpTypDanych[] lista_typow, Object []hide) {
         super(lista_nazw, lista_typow);
@@ -79,7 +81,9 @@ public class SparseDataFrame extends DataFrame {
             }
     }
 
-    public DataFrame toDense(SparseDataFrame SPD){ //zwraca DataFrame (konwertuje SparseDataFrame do DataFrame)
+//--------------------ToDense - zwraca DataFrame (konwertuje SparseDataFrame do DataFrame)------------------------------------------------------------
+
+    public DataFrame toDense(SparseDataFrame SPD){
         String []nazwy = new String[SPD.kolumny.length];
         TmpTypDanych [] typy = new TmpTypDanych[SPD.kolumny.length];
 

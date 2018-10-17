@@ -9,7 +9,7 @@ public class DataFrame {
     String [] lista_nazw;
     TmpTypDanych [] lista_typow;
 
-
+//-----------------Konstruktory DataFrame -----------------------------
 
     public void konstruktorZwyczajny(String[] lista_nazw, TmpTypDanych[] lista_typow) {
         kolumny = new Kolumna[lista_typow.length];
@@ -46,6 +46,7 @@ public class DataFrame {
         }
     }
 
+// -----------------------dodajElement gdzie element to cały wiersz z danymi--------------------
 
     public void dodajElement(Object[] elementy){
         if(elementy.length!=kolumny.length){
@@ -58,7 +59,7 @@ public class DataFrame {
         }
     }
 
-
+//------------ zwrocWiersz - zwraca wiersz o indeksie i ------------------------------
     public Object[] zwrocWiersz(int i){
         Object[] wiersz=new Object[kolumny.length];
         int j=0;
@@ -68,6 +69,7 @@ public class DataFrame {
         return wiersz;
     }
 
+// -------------------funkcje zadane w lab1-------------------------
     public int size() {
         return ilosc_wierszy;
     }
