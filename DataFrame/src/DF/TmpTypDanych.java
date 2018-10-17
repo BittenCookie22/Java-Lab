@@ -27,7 +27,7 @@ public enum TmpTypDanych {
         }
     }
 
-// zwraca typ danych w formacie TmpTypDanych z podanego w argumencie stringa
+//   zwraca typ danych w formacie TmpTypDanych z podanego w argumencie stringa
     public static TmpTypDanych zwrocTypDanej(String nazwa) {
         for (TmpTypDanych tmp : TmpTypDanych.values()) {
             if (tmp.nazwa_typu.equals(nazwa)) {

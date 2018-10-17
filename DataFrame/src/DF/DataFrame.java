@@ -9,7 +9,7 @@ public class DataFrame {
     String [] lista_nazw;
     TmpTypDanych [] lista_typow;
 
-//-----------------Konstruktory DataFrame -----------------------------
+//-----------------Konstruktory DataFrame ------------------------------
 
     public void konstruktorZwyczajny(String[] lista_nazw, TmpTypDanych[] lista_typow) {
         kolumny = new Kolumna[lista_typow.length];

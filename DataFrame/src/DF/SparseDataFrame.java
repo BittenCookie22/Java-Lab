@@ -98,7 +98,7 @@ public class SparseDataFrame extends DataFrame {
         }
         return df;
     }
-// -------------------------Implementacja metod z DataFrame------------------------
+// ------------------------Implementacja metod z DataFrame------------------------
 
     @Override
     public int size() {
