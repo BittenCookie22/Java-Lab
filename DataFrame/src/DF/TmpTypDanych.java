@@ -10,7 +10,7 @@ public enum TmpTypDanych {
         this.nazwa_typu = nazwa_typu;
     }
 
-    public Object konewrsjaTypuZeStringa(TmpTypDanych typ, String nazwa) {
+    public static Object konewrsjaTypuZeStringa(TmpTypDanych typ, String nazwa) {
         switch (typ) {
             case INT:
                 return Integer.parseInt(nazwa);
