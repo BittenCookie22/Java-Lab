@@ -1,5 +1,6 @@
 package DF;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
 public class SparseDataFrame extends DataFrame {
@@ -80,6 +81,8 @@ public class SparseDataFrame extends DataFrame {
 
             }
     }
+
+
 
 //--------------------ToDense - zwraca DataFrame (konwertuje SparseDataFrame do DataFrame)------------------------------------------------------------
 
@@ -164,6 +167,27 @@ public class SparseDataFrame extends DataFrame {
         }
 
         return df;
+    }
+
+    //---czyteanie z pliku KONSTRUKTORY---------
+    public SparseDataFrame(String path,String[] typy_kolumn,Object[]hide) throws IOException {
+        this(path,typy_kolumn,null,hide); //nazwy kolumn są zawarte w 1szej linii pliku
+
+    }
+
+    public SparseDataFrame(String path,String[] typy_kolumn, String[]nazwy_kolumn,Object[]hide) throws IOException { // header==false
+        super(typy_kolumn.length);
+        boolean header = nazwy_kolumn==null;
+        for (int i =0; i<typy_kolumn.length;i++){
+            if (!header){ //jesli podano nazwy kolumn w arg, a brak ich w 1szej linii pilku
+                kolumny[i]=new SparseKolumna(nazwy_kolumn[i],TmpTypDanych.zwrocTypDanej(typy_kolumn[i]),hide[i]); //to trzeba ręcznie wczytać
+            }
+            else{
+                continue;
+            }
+            readingFromFileFunction(path,header);
+        }
+
     }
     //---------------------------------------------------------------------------------------------------------------------------------------
     }

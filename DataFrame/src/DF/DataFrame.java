@@ -56,6 +56,13 @@ public class DataFrame {
         }
     }
 
+    protected DataFrame(int ilosc_kolumn){
+        this.kolumny=new Kolumna[ilosc_kolumn];
+        this.ilosc_wierszy=0;
+        this.lista_typow=null;
+        this.lista_nazw=null;
+    }
+
    // public DataFrame(String path,String [] tablica_typow, boolean header){//jesli header==true oznacz to że pierwsza linia w pliku to nagłówek. Jeśli header==false to znaczy że należy podać kolejny argument z nazwami kolumn. Domyślnie header==true
 
     //}
@@ -193,15 +200,15 @@ public void readingFromFileFunction(String path,boolean header) throws IOExcepti
 }
 
     public DataFrame(String path,String[] typy_kolumn) throws IOException{
-        this(path,typy_kolumn,null);
+        this(path,typy_kolumn,null); //nazwy kolumn są zawarte w 1szej linii pliku
 
     }
     public DataFrame(String path,String[] typy_kolumn, String[]nazwy_kolumn) throws IOException { // header==false
-        this(typy_kolumn,nazwy_kolumn);
+        this(typy_kolumn.length);
         boolean header = nazwy_kolumn==null;
         for (int i =0; i<typy_kolumn.length;i++){
-            if (header){ //jesli brak nazw kolumn
-                kolumny[i]=new Kolumna(nazwy_kolumn[i],TmpTypDanych.zwrocTypDanej(typy_kolumn[i]));
+            if (!header){ //jesli podano nazwy kolumn w arg, a brak ich w 1szej linii pilku
+                kolumny[i]=new Kolumna(nazwy_kolumn[i],TmpTypDanych.zwrocTypDanej(typy_kolumn[i])); //to trzeba ręcznie wczytać
             }
             else{
                 continue;
