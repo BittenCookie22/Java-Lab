@@ -45,7 +45,7 @@ public class SparseDataFrame extends DataFrame {
         public void dodaj(Object element){
             boolean check = hide.equals(element);
             if (check==false){ //jesli obiekt nie jest hide to dodajemy do kolumny
-                super.dodaj(new COOValue(element,ilosc_wierszy));
+                dane.add(new COOValue(element,ilosc_wierszy));
             }
             ilosc_wierszy++;
         }
@@ -73,7 +73,7 @@ public class SparseDataFrame extends DataFrame {
         Object [] tablica_typow = new Object[kolumny.length];
             for (int i=0;i<DF.ilosc_wierszy;i++){
                 int tmp=0;
-                for (Kolumna kol:kolumny){
+                for (Kolumna kol:DF.kolumny){
                     tablica_typow[tmp++]=kol.zwrocObiekt(i);
                 }
                 dodajElement(tablica_typow);

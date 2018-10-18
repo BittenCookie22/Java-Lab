@@ -29,9 +29,11 @@ public class DataFrame {
 
     public DataFrame(String[] lista_nazw, String[] lista_typow) {
         TmpTypDanych[] typy = new TmpTypDanych[lista_typow.length];
+        this.lista_nazw=lista_nazw;
         for (int i = 0; i < lista_typow.length; i++) {
             typy[i] = TmpTypDanych.zwrocTypDanej(lista_typow[i]);
         }
+        this.lista_typow=typy;
         konstruktorZwyczajny(lista_nazw, typy);
 
     }
@@ -44,6 +46,13 @@ public class DataFrame {
             if (ilosc_wierszy != i.dane.size()) {
                 throw new RuntimeException("Blad w dlugosci kolumn,kolumny nie sa rownej dlugosci!");
             }
+        }
+        int tmp=0;
+        for (Kolumna k : kolumny){
+                this.lista_nazw[tmp]=k.nazwa;
+                this.lista_typow[tmp]=k.typ;
+                tmp++;
+
         }
     }
 
@@ -168,7 +177,7 @@ public void readingFromFileFunction(String path,boolean header) throws IOExcepti
             int m=0;
             for(String wartoscWpostaciStringa:strLine){
                 //TmpTypDanych tmpTyp =
-                wartosciZpliku[m] = TmpTypDanych.konewrsjaTypuZeStringa(kolumny[m].typ,wartoscWpostaciStringa); //konwersja do konkretnego typu danych
+                wartosciZpliku[m] = TmpTypDanych.konewrsjaDoDanegoTypuZeStringa(kolumny[m].typ,wartoscWpostaciStringa); //konwersja do konkretnego typu danych
                 m++;
             }
             dodajElement(wartosciZpliku);
@@ -191,7 +200,7 @@ public void readingFromFileFunction(String path,boolean header) throws IOExcepti
         this(typy_kolumn,nazwy_kolumn);
         boolean header = nazwy_kolumn==null;
         for (int i =0; i<typy_kolumn.length;i++){
-            if (header){
+            if (header){ //jesli brak nazw kolumn
                 kolumny[i]=new Kolumna(nazwy_kolumn[i],TmpTypDanych.zwrocTypDanej(typy_kolumn[i]));
             }
             else{
