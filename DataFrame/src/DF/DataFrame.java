@@ -1,18 +1,22 @@
 package DF;
 
-import java.io.*;
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.NoSuchElementException;
 
 public class DataFrame {
     Kolumna[] kolumny;
     int ilosc_wierszy;
     String[] lista_nazw;
-    TmpTypDanych[] lista_typow;
+    Class<? extends Value>[] lista_typow;
 
 //-----------------Konstruktory DataFrame ------------------------------
 
-    public void konstruktorZwyczajny(String[] lista_nazw, TmpTypDanych[] lista_typow) {
+    public DataFrame(){};
+
+    public void konstruktorZwyczajny(String[] lista_nazw,  Class<? extends Value>[]lista_typow) {
         kolumny = new Kolumna[lista_typow.length];
         for (int i = 0; i < lista_typow.length; i++) {
             kolumny[i] = new Kolumna(lista_nazw[i], lista_typow[i]);
@@ -20,23 +24,23 @@ public class DataFrame {
         ilosc_wierszy = 0; // na początku brak danych == brak wierszy
     }
 
-    public DataFrame(String[] lista_nazw, TmpTypDanych[] lista_typow) {
+    public DataFrame(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
         this.lista_typow = lista_typow;
         this.lista_nazw = lista_nazw;
 
         konstruktorZwyczajny(lista_nazw, lista_typow);
     }
 
-    public DataFrame(String[] lista_nazw, String[] lista_typow) {
-        TmpTypDanych[] typy = new TmpTypDanych[lista_typow.length];
-        this.lista_nazw=lista_nazw;
-        for (int i = 0; i < lista_typow.length; i++) {
-            typy[i] = TmpTypDanych.zwrocTypDanej(lista_typow[i]);
-        }
-        this.lista_typow=typy;
-        konstruktorZwyczajny(lista_nazw, typy);
-
-    }
+//    public DataFrame(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
+//        Value[] typy = new Value[lista_typow.length];
+//        this.lista_nazw=lista_nazw;
+//        for (int i = 0; i < lista_typow.length; i++) {
+//            typy[i] = Value.zwrocTypDanej(lista_typow[i]);
+//        }
+//        this.lista_typow=typy;
+//        konstruktorZwyczajny(lista_nazw, typy);
+//
+//    }
 
 
     public DataFrame(Kolumna[] kolumny) {
@@ -48,6 +52,8 @@ public class DataFrame {
             }
         }
         int tmp=0;
+        lista_nazw = new String[kolumny.length];
+        lista_typow = new Class[kolumny.length];
         for (Kolumna k : kolumny){
                 this.lista_nazw[tmp]=k.nazwa;
                 this.lista_typow[tmp]=k.typ;
@@ -59,8 +65,8 @@ public class DataFrame {
     protected DataFrame(int ilosc_kolumn){
         this.kolumny=new Kolumna[ilosc_kolumn];
         this.ilosc_wierszy=0;
-        this.lista_typow=null;
-        this.lista_nazw=null;
+        lista_nazw = new String[ilosc_kolumn];
+        lista_typow = new Class[ilosc_kolumn];
     }
 
    // public DataFrame(String path,String [] tablica_typow, boolean header){//jesli header==true oznacz to że pierwsza linia w pliku to nagłówek. Jeśli header==false to znaczy że należy podać kolejny argument z nazwami kolumn. Domyślnie header==true
@@ -69,7 +75,7 @@ public class DataFrame {
 
 // -----------------------dodajElement gdzie element to cały wiersz z danymi--------------------
 
-    public void dodajElement(Object[] elementy) {
+    public void dodajElement(Value[] elementy) {
         if (elementy.length != kolumny.length) {
             throw new RuntimeException("blad");
         }
@@ -81,8 +87,8 @@ public class DataFrame {
     }
 
     //------------ zwrocWiersz - zwraca wiersz o indeksie i ------------------------------
-    public Object[] zwrocWiersz(int i) {
-        Object[] wiersz = new Object[kolumny.length];
+    public Value[] zwrocWiersz(int i) {
+        Value[] wiersz = new Value[kolumny.length];
         int j = 0;
         for (Kolumna k : kolumny)
             wiersz[j++] = k.zwrocObiekt(i);
@@ -118,16 +124,16 @@ public class DataFrame {
             throw new IndexOutOfBoundsException("Niepoprawny zakres");
         }
 
-        String[] typy = new String[kolumny.length]; //tablica na typy w nowej DF
+        Class<? extends Value>[] typy = new Class[kolumny.length]; //tablica na typy w nowej DF
         String[] nazwy = new String[kolumny.length]; //tablica na nazwy w nowej DF
 
         for (int i = 0; i < kolumny.length; i++) { // wypełnianie tablic na podstawie starej DF
-            typy[i] = kolumny[i].typ.nazwa_typu;
+            typy[i] = kolumny[i].typ;
             nazwy[i] = new String(kolumny[i].nazwa);
         }
 
         DataFrame nowa_DF = new DataFrame(nazwy, typy); //nowa DF
-        Object[] nowe_wiersze = new Object[kolumny.length];
+        Value[] nowe_wiersze = new Value[kolumny.length];
 
         for (int i = from; i <= to; i++) {
             for (Kolumna k : this.kolumny) {   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
@@ -162,58 +168,69 @@ public class DataFrame {
 
 //---------------czytanie z pliku-----------------------
 
-public void readingFromFileFunction(String path,boolean header) throws IOException {
-    // Open the file
-    FileInputStream fstream = new FileInputStream(path);
-    BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+    public void readingFromFileFunction(String path,boolean header) throws IOException {
+        // Open the file
+        FileInputStream fstream = new FileInputStream(path);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
-    String []strLine;
+        String []strLine;
 
 
-    if(header) // to znaczy że pierwsza linia pliku ma w sobie nazwy kolumn
-    {
-        strLine=br.readLine().split(",");
-        for (int i = 0; i < kolumny.length; i++) {
-            kolumny[i].nazwa=strLine[i];
-        }
-
-        String tmp;
-        Object[]wartosciZpliku =  new Object[kolumny.length];
-        while(((tmp=br.readLine() )!= null)){
-            strLine=tmp.split(",");
-            int m=0;
-            for(String wartoscWpostaciStringa:strLine){
-                //TmpTypDanych tmpTyp =
-                wartosciZpliku[m] = TmpTypDanych.konewrsjaDoDanegoTypuZeStringa(kolumny[m].typ,wartoscWpostaciStringa); //konwersja do konkretnego typu danych
-                m++;
+        if(header) // to znaczy że pierwsza linia pliku ma w sobie nazwy kolumn
+        {
+            strLine=br.readLine().split(",");
+            for (int i = 0; i < kolumny.length; i++) {
+                kolumny[i].nazwa=strLine[i];
             }
-            dodajElement(wartosciZpliku);
+
+            String tmp;
+            Value[]wartosciZpliku =  new Value[kolumny.length];
+            while(((tmp=br.readLine() )!= null)){
+                strLine=tmp.split(",");
+                int m=0;
+                for(String wartoscWpostaciStringa:strLine){
+                    //TmpTypDanych tmpTyp =
+                    try {
+                        wartosciZpliku[m] = (kolumny[m].typ).newInstance().create(wartoscWpostaciStringa);
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    //wartoscWpostaciStringa); //konwersja do konkretnego typu danych
+                    m++;
+                }
+                dodajElement(wartosciZpliku);
+            }
         }
-    }
 
-   // else{ // trzeba zczytać typy kolumn ręcznie
+        // else{ // trzeba zczytać typy kolumn ręcznie
 
-    //}
+        //}
 
 //Close the input stream
-    br.close();
-}
+        br.close();
+    }
 
-    public DataFrame(String path,String[] typy_kolumn) throws IOException{
+    public DataFrame(String path, Class<? extends Value>[] typy_kolumn) throws IOException{
         this(path,typy_kolumn,null); //nazwy kolumn są zawarte w 1szej linii pliku
 
     }
-    public DataFrame(String path,String[] typy_kolumn, String[]nazwy_kolumn) throws IOException { // header==false
+    public DataFrame(String path, Class<? extends Value>[] typy_kolumn, String[]nazwy_kolumn) throws IOException { // header==false
         this(typy_kolumn.length);
         boolean header = nazwy_kolumn==null;
         for (int i =0; i<typy_kolumn.length;i++){
             if (!header){ //jesli podano nazwy kolumn w arg, a brak ich w 1szej linii pilku
-                kolumny[i]=new Kolumna(nazwy_kolumn[i],TmpTypDanych.zwrocTypDanej(typy_kolumn[i])); //to trzeba ręcznie wczytać
+
+                    kolumny[i]=new Kolumna(nazwy_kolumn[i],(typy_kolumn[i])); //to trzeba ręcznie wczytać
+
             }
             else{
                 continue;
             }
-         readingFromFileFunction(path,header);
+            readingFromFileFunction(path,header);
         }
 
     }

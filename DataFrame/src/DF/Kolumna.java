@@ -1,18 +1,19 @@
 package DF;
 
-import java.io.OptionalDataException;
 import java.util.ArrayList;
 
 public class Kolumna {
     String nazwa;
-    TmpTypDanych typ;
-    ArrayList dane;
+    Class<? extends Value> typ;
+    ArrayList<Value> dane;
 
-    public Kolumna(String nazwa, TmpTypDanych typ){
+    public Kolumna(String nazwa,  Class<? extends Value> typ){
         this.nazwa=nazwa;
         this.typ=typ;
-        dane =  new ArrayList(10);
+        dane =  new ArrayList<>(10);
     }
+
+    public Kolumna(){};
 
     public Kolumna(Kolumna do_skopiowania){  // konstruktor kopiujący potrzebny do kopii głębokiej
         this.nazwa = new String(do_skopiowania.nazwa);
@@ -21,12 +22,14 @@ public class Kolumna {
 
     }
 
-    public Object zwrocObiekt(int indeks){
+    public Value zwrocObiekt(int indeks){
         return dane.get(indeks);
     }
 
-    public void dodaj (Object element){
-        this.dane.add(element);
+    public void dodaj (Value element)throws  IllegalArgumentException{
+        if(typ.isInstance(element)){
+            this.dane.add(element);}
+            else {throw new IllegalArgumentException();}
     }
 
 

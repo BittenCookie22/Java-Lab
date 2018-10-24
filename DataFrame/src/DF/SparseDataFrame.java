@@ -2,19 +2,19 @@ package DF;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class SparseDataFrame extends DataFrame {
 
 // ----------------COOValue - (immutable) przechowuje indeksy niezerowych elementów i ich wartość------------------
-    final class COOValue {
-        private final Object wartosc;
+    final class COOValue extends Value {
+        private final Value wartosc;
         private final int indeks;
 
-         COOValue(Object wartosc, int indeks) {
+         COOValue(Value wartosc, int indeks) {
             this.wartosc = wartosc;
             this.indeks = indeks;
         }
-
         public int zwrocIndeks() {
             return indeks;
         }
@@ -22,15 +22,118 @@ public class SparseDataFrame extends DataFrame {
         public Object zwrocWartosc(){
             return wartosc;
         }
+
+
+    @Override
+    public  Value getValue(){
+        return wartosc;
     }
+
+
+    @Override
+    public String toString() {
+        return "COOValue{" + "wartosc=" + wartosc + ", indeks=" + indeks + '}';
+    }
+
+
+    @Override
+    public COOValue add(Value val)throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public COOValue sub(Value val)throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public COOValue mul(Value val)throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public COOValue div(Value val) throws UnsupportedOperationException{
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public COOValue pow(Value val) throws UnsupportedOperationException{
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public boolean eq(Value val)throws UnsupportedOperationException{ //są równe jeśli mają te samą warotść na tym samym indeksie
+             if(val instanceof COOValue){
+                 if( ((COOValue)val).indeks==this.indeks && (((COOValue)val).wartosc).equals(this.wartosc)){return true;}
+             }else{return false;}
+             throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public boolean neq(Value val)throws UnsupportedOperationException{
+        if(val instanceof COOValue){
+            if( !((((COOValue)val).wartosc).equals(this.wartosc)  || ((COOValue)val).indeks==this.indeks)){return true;}
+        }else{return false;}
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public boolean lte(Value val)throws UnsupportedOperationException{ //this jest mniejsza od val jesli jej warotsc jest mniejsza
+        if(val instanceof COOValue){
+
+            return wartosc.lte(((COOValue) val).wartosc);
+        }
+        return wartosc.lte(val);
+    }
+
+
+    @Override
+    public boolean gte(Value val)throws UnsupportedOperationException{
+        if(val instanceof COOValue){
+            if(isNumeric.isThisValueNumeric(this.wartosc) & isNumeric.isThisValueNumeric(val)){
+                if(this.wartosc.gte(val)){return true;}
+            }else{return false;}
+        }
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public  boolean equals(Object other){
+        if (other==null){return false;}
+        if (other instanceof COOValue){
+            COOValue otherCOO = (COOValue) other;
+            if(this.wartosc.eq(((COOValue) other).wartosc) & this.indeks == ((COOValue) other).indeks){return true;}
+
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(wartosc)*31 + Objects.hashCode(indeks)*7;
+    }
+
+    @Override
+    public COOValue create(String s) throws UnsupportedOperationException{
+             throw new UnsupportedOperationException();
+    }
+}
+
+
+
+
+
 
 //----------------SparseKolumna - specjalna kolumna dla SprsDF, przechowuje info o tym jaki obiekt ukrywać (hide) i ilość wierszy w kolumnie---------------------------------------------------------------------------
 
     public class SparseKolumna extends Kolumna {
-        Object hide;
+        Value hide;
         int ilosc_wierszy;
 
-        public SparseKolumna(String nazwa,TmpTypDanych typ, Object hide){
+        public SparseKolumna(String nazwa, Class<? extends Value> typ, Value hide){
             super(nazwa,typ);
             this.hide=hide;
             ilosc_wierszy=0;
@@ -43,7 +146,7 @@ public class SparseDataFrame extends DataFrame {
         }
 
         @Override
-        public void dodaj(Object element){
+        public void dodaj(Value element){
             boolean check = hide.equals(element);
             if (check==false){ //jesli obiekt nie jest hide to dodajemy do kolumny
                 dane.add(new COOValue(element,ilosc_wierszy));
@@ -53,25 +156,27 @@ public class SparseDataFrame extends DataFrame {
     }
     //--------------Konstruktory SparseDataFrame------------------------------------
 
-    public SparseDataFrame(String[] lista_nazw, TmpTypDanych[] lista_typow, Object []hide) {
+    public SparseDataFrame(){};
+
+    public SparseDataFrame(String[] lista_nazw,  Class<? extends Value>[] lista_typow, Value []hide) {
         super(lista_nazw, lista_typow);
         for (int i=0;i<lista_typow.length;i++){
-            kolumny[i]=new SparseKolumna(lista_nazw[i],TmpTypDanych.zwrocTypDanej(lista_typow[i].nazwa_typu),hide[i]);
+            kolumny[i]=new SparseKolumna(lista_nazw[i],lista_typow[i],hide[i]);
         }
     }
     public SparseDataFrame(SparseKolumna[] kolumny) {
         super(kolumny);
     }
 
-    public SparseDataFrame(DataFrame DF, Object[] hide) {
+    public SparseDataFrame(DataFrame DF, Value[] hide) {
         super(DF.lista_nazw, DF.lista_typow);
         String []lista_kolumn = DF.lista_nazw;
-        TmpTypDanych [] lista_typow = DF.lista_typow;
+        Class<? extends Value> [] lista_typow = DF.lista_typow;
             for (int i = 0; i < DF.lista_typow.length; i++) {
                 kolumny[i]=new SparseKolumna(lista_kolumn[i],lista_typow[i],hide[i]);
             }
 
-        Object [] tablica_typow = new Object[kolumny.length];
+        Value [] tablica_typow = new Value[kolumny.length];
             for (int i=0;i<DF.ilosc_wierszy;i++){
                 int tmp=0;
                 for (Kolumna kol:DF.kolumny){
@@ -88,7 +193,7 @@ public class SparseDataFrame extends DataFrame {
 
     public DataFrame toDense(SparseDataFrame SPD){
         String []nazwy = new String[SPD.kolumny.length];
-        TmpTypDanych [] typy = new TmpTypDanych[SPD.kolumny.length];
+        Class<? extends Value> [] typy = new  Class[SPD.kolumny.length];
 
         nazwy = SPD.lista_nazw;
         typy = SPD.lista_typow;
@@ -151,8 +256,8 @@ public class SparseDataFrame extends DataFrame {
             throw new IndexOutOfBoundsException("Niepoprawny zakres");
         }
         String[] nazwy = new String[kolumny.length];
-        TmpTypDanych[] typy = new TmpTypDanych[kolumny.length];
-        Object[] hide= new Object[kolumny.length];
+        Class<? extends Value>[] typy = new  Class[kolumny.length];
+        Value[] hide= new Value[kolumny.length];
 
         nazwy = this.lista_nazw;
         typy = this.lista_typow;
@@ -170,17 +275,17 @@ public class SparseDataFrame extends DataFrame {
     }
 
     //---czyteanie z pliku KONSTRUKTORY---------
-    public SparseDataFrame(String path,String[] typy_kolumn,Object[]hide) throws IOException {
+    public SparseDataFrame(String path, Class<? extends Value>[] typy_kolumn,Value[] hide) throws IOException {
         this(path,typy_kolumn,null,hide); //nazwy kolumn są zawarte w 1szej linii pliku
 
     }
 
-    public SparseDataFrame(String path,String[] typy_kolumn, String[]nazwy_kolumn,Object[]hide) throws IOException { // header==false
+    public SparseDataFrame(String path, Class<? extends Value>[] typy_kolumn, String[]nazwy_kolumn,Value[]hide) throws IOException { // header==false
         super(typy_kolumn.length);
         boolean header = nazwy_kolumn==null;
         for (int i =0; i<typy_kolumn.length;i++){
             if (!header){ //jesli podano nazwy kolumn w arg, a brak ich w 1szej linii pilku
-                kolumny[i]=new SparseKolumna(nazwy_kolumn[i],TmpTypDanych.zwrocTypDanej(typy_kolumn[i]),hide[i]); //to trzeba ręcznie wczytać
+                kolumny[i]=new SparseKolumna(nazwy_kolumn[i],typy_kolumn[i],hide[i]); //to trzeba ręcznie wczytać
             }
             else{
                 continue;
