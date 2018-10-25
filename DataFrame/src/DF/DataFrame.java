@@ -14,9 +14,12 @@ public class DataFrame {
 
 //-----------------Konstruktory DataFrame ------------------------------
 
-    public DataFrame(){};
+    public DataFrame() {
+    }
 
-    public void konstruktorZwyczajny(String[] lista_nazw,  Class<? extends Value>[]lista_typow) {
+    ;
+
+    public void konstruktorZwyczajny(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
         kolumny = new Kolumna[lista_typow.length];
         for (int i = 0; i < lista_typow.length; i++) {
             kolumny[i] = new Kolumna(lista_nazw[i], lista_typow[i]);
@@ -24,10 +27,10 @@ public class DataFrame {
         ilosc_wierszy = 0; // na początku brak danych == brak wierszy
     }
 
-    public DataFrame(String[] nazwyKolumn,Class<? extends Value>[] typyKolumn){
+    public DataFrame(String[] nazwyKolumn, Class<? extends Value>[] typyKolumn) {
         this(nazwyKolumn.length);
-        for(int i =0; i<typyKolumn.length;i++)
-            kolumny[i]=new Kolumna(nazwyKolumn[i],typyKolumn[i]);
+        for (int i = 0; i < typyKolumn.length; i++)
+            kolumny[i] = new Kolumna(nazwyKolumn[i], typyKolumn[i]);
     }
 
 //    public DataFrame(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
@@ -50,25 +53,25 @@ public class DataFrame {
                 throw new RuntimeException("Blad w dlugosci kolumn,kolumny nie sa rownej dlugosci!");
             }
         }
-        int tmp=0;
+        int tmp = 0;
         lista_nazw = new String[kolumny.length];
         lista_typow = new Class[kolumny.length];
-        for (Kolumna k : kolumny){
-                this.lista_nazw[tmp]=k.nazwa;
-                this.lista_typow[tmp]=k.typ;
-                tmp++;
+        for (Kolumna k : kolumny) {
+            this.lista_nazw[tmp] = k.nazwa;
+            this.lista_typow[tmp] = k.typ;
+            tmp++;
 
         }
     }
 
-    protected DataFrame(int ilosc_kolumn){
-        this.kolumny=new Kolumna[ilosc_kolumn];
-        this.ilosc_wierszy=0;
+    protected DataFrame(int ilosc_kolumn) {
+        this.kolumny = new Kolumna[ilosc_kolumn];
+        this.ilosc_wierszy = 0;
         lista_nazw = new String[ilosc_kolumn];
         lista_typow = new Class[ilosc_kolumn];
     }
 
-   // public DataFrame(String path,String [] tablica_typow, boolean header){//jesli header==true oznacz to że pierwsza linia w pliku to nagłówek. Jeśli header==false to znaczy że należy podać kolejny argument z nazwami kolumn. Domyślnie header==true
+    // public DataFrame(String path,String [] tablica_typow, boolean header){//jesli header==true oznacz to że pierwsza linia w pliku to nagłówek. Jeśli header==false to znaczy że należy podać kolejny argument z nazwami kolumn. Domyślnie header==true
 
     //}
 
@@ -123,7 +126,7 @@ public class DataFrame {
             throw new IndexOutOfBoundsException("Niepoprawny zakres");
         }
 
-        Class<? extends Value>[] typy =  ( Class<? extends Value>[])(new Class[kolumny.length]); //tablica na typy w nowej DF
+        Class<? extends Value>[] typy = (Class<? extends Value>[]) (new Class[kolumny.length]); //tablica na typy w nowej DF
         String[] nazwy = new String[kolumny.length]; //tablica na nazwy w nowej DF
 
         for (int i = 0; i < kolumny.length; i++) { // wypełnianie tablic na podstawie starej DF
@@ -136,7 +139,7 @@ public class DataFrame {
 
 
         for (int i = from; i <= to; i++) {
-            for(int j=0;j<kolumny.length;j++) {   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
+            for (int j = 0; j < kolumny.length; j++) {   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
                 nowe_wiersze[j] = this.kolumny[j].dane.get(i);
             }
             nowa_DF.dodajElement(nowe_wiersze);
@@ -168,51 +171,51 @@ public class DataFrame {
 
 //---------------czytanie z pliku-----------------------
 
-    public void readingFromFileFunction(String path,boolean header) throws IOException {
+    public void readingFromFileFunction(String path, boolean header) throws IOException {
         // Open the file
         FileInputStream fstream = new FileInputStream(path);
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 
-        String []strLine;
+        String[] strLine;
 
 
-        if(header) // to znaczy że pierwsza linia pliku ma w sobie nazwy kolumn
+        if (header) // to znaczy że pierwsza linia pliku ma w sobie nazwy kolumn
         {
-            strLine=br.readLine().split(",");
+            strLine = br.readLine().split(",");
             for (int i = 0; i < kolumny.length; i++) {
-                kolumny[i].nazwa=strLine[i];
-            }
-
-            String tmp;
-            Value[]wartosciZpliku =  new Value[kolumny.length];
-            while(((tmp=br.readLine() )!= null)){
-                strLine=tmp.split(",");
-                int m=0;
-                for(String wartoscWpostaciStringa:strLine){
-                    //TmpTypDanych tmpTyp =
-                    try {
-                        wartosciZpliku[m] = (kolumny[m].typ).newInstance().create(wartoscWpostaciStringa);
-                    } catch (InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    //wartoscWpostaciStringa); //konwersja do konkretnego typu danych
-                    m++;
-                }
-                dodajElement(wartosciZpliku);
+                kolumny[i].nazwa = strLine[i];
             }
         }
+        String tmp;
+        Value[] wartosciZpliku = new Value[kolumny.length];
+        while (((tmp = br.readLine()) != null)) {
+            strLine = tmp.split(",");
+            int m = 0;
+            for (String wartoscWpostaciStringa : strLine) {
+                //TmpTypDanych tmpTyp =
+                try {
+                    wartosciZpliku[m] = (kolumny[m].typ).newInstance().create(wartoscWpostaciStringa);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
-        // else{ // trzeba zczytać typy kolumn ręcznie
 
-        //}
+                //wartoscWpostaciStringa); //konwersja do konkretnego typu danych
+                m++;
+            }
+            dodajElement(wartosciZpliku);
+        }
+
+
+    // else{ // trzeba zczytać typy kolumn ręcznie
+
+    //}
 
 //Close the input stream
         br.close();
-    }
+}
 
     public DataFrame(String path, Class<? extends Value>[] typy_kolumn) throws IOException{
         this(path,typy_kolumn,null); //nazwy kolumn są zawarte w 1szej linii pliku
@@ -225,6 +228,20 @@ public class DataFrame {
             kolumny[i]=new Kolumna(header? "" : nazwy_kolumn[i],typy_kolumn[i]);
 
         readingFromFileFunction(path,header);
+
+    }
+
+    public void addRecord(Value... values) {
+        if(values.length!=kolumny.length)
+            throw new ArrayIndexOutOfBoundsException();
+        for(int i=0;i<kolumny.length;i++)
+            if(!kolumny[i].typ.isInstance(values[i]))
+                throw new IndexOutOfBoundsException();
+
+        int i=0;
+        ilosc_wierszy++;
+        for(Kolumna k:kolumny)
+            k.dodaj(values[i++]);
 
     }
 

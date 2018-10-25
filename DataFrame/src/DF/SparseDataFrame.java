@@ -24,6 +24,11 @@ public class SparseDataFrame extends DataFrame {
         }
 
 
+        public Value zwrocObiekt1(){
+             return this.wartosc;
+        }
+
+
     @Override
     public  Value getValue(){
         return wartosc;
@@ -153,7 +158,33 @@ public class SparseDataFrame extends DataFrame {
             }
             ilosc_wierszy++;
         }
+
+        @Override
+        public Value zwrocObiekt(int index){
+            //binary search
+            int iR=dane.size()-1;
+            int iL=0;
+            int t,i;
+            if(dane.size()==0 && ilosc_wierszy>0)
+                return hide;
+            do{
+                i = Math.floorDiv((iR+iL),2);
+                t=((COOValue)(dane.get(i))).zwrocIndeks();
+
+                if(t<index)
+                    iL=i+1;
+                else if(t>index)
+                    iR=i-1;
+                else
+                    return ((COOValue)(dane.get(i))).getValue();
+
+            }while(iL<=iR);
+
+            return hide;
+        }
+
     }
+
     //--------------Konstruktory SparseDataFrame------------------------------------
 
     public SparseDataFrame(){};
@@ -256,13 +287,12 @@ public class SparseDataFrame extends DataFrame {
             throw new IndexOutOfBoundsException("Niepoprawny zakres");
         }
         String[] nazwy = new String[kolumny.length];
-        Class<? extends Value>[] typy = new  Class[kolumny.length];
+        Class<? extends Value>[] typy = (Class<? extends Value>[] )new Class[kolumny.length];
         Value[] hide= new Value[kolumny.length];
 
-        nazwy = this.lista_nazw;
-        typy = this.lista_typow;
-
         for(int i=0;i<kolumny.length;i++) {
+            nazwy[i] =kolumny[i].nazwa;
+            typy[i] = kolumny[i].typ;
             hide[i] = ((SparseKolumna)kolumny[i]).hide;
         }
 
@@ -283,15 +313,10 @@ public class SparseDataFrame extends DataFrame {
     public SparseDataFrame(String path, Class<? extends Value>[] typy_kolumn, String[]nazwy_kolumn,Value[]hide) throws IOException { // header==false
         super(typy_kolumn.length);
         boolean header = nazwy_kolumn==null;
-        for (int i =0; i<typy_kolumn.length;i++){
-            if (!header){ //jesli podano nazwy kolumn w arg, a brak ich w 1szej linii pilku
-                kolumny[i]=new SparseKolumna(nazwy_kolumn[i],typy_kolumn[i],hide[i]); //to trzeba ręcznie wczytać
-            }
-            else{
-                continue;
-            }
-            readingFromFileFunction(path,header);
-        }
+        for(int i=0;i<typy_kolumn.length;i++)
+            kolumny[i]=new SparseKolumna(header? "" : nazwy_kolumn[i],typy_kolumn[i],hide[i]);
+        readingFromFileFunction(path,header);
+
 
     }
     //---------------------------------------------------------------------------------------------------------------------------------------
