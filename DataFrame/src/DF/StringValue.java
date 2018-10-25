@@ -18,7 +18,7 @@ public class StringValue  extends Value{
 
     @Override
     public String toString() {
-        return "StringValue{" + "value='" + value + '\'' + '}';
+        return this.value;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class StringValue  extends Value{
     @Override
     public boolean lte(Value val) {// sprawdzany porządek alfabetyczny czy this.value jest wczesniej niz val
         if(val instanceof StringValue){
-            if((this.value.compareTo(((StringValue)val).value))>0){
+            if((this.value.compareTo(((StringValue)val).value))>=0){
                 return true;
             } else{return false;}
         }
@@ -85,7 +85,7 @@ public class StringValue  extends Value{
     @Override
     public boolean gte(Value val) {// sprawdzany porządek alfabetyczny czy this.value jest później niz val
         if(val instanceof StringValue){
-            if((this.value.compareTo(((StringValue)val).value))<0){
+            if((this.value.compareTo(((StringValue)val).value))<=0){
                 return true;
             } else{return false;}
         }
@@ -105,7 +105,7 @@ public class StringValue  extends Value{
     @Override
     public int hashCode() {
 
-        return this.value.hashCode()*37;
+        return getValue().hashCode()*37;
     }
 
     @Override

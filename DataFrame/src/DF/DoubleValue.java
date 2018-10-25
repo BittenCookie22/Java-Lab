@@ -1,8 +1,6 @@
 package DF;
 
-import java.util.Objects;
-
-public class DoubleValue extends Value{
+public class DoubleValue extends NumericValue{
     private double value;
 
     public DoubleValue(double value){
@@ -18,7 +16,7 @@ public class DoubleValue extends Value{
 
     @Override
     public String toString() {
-        return "DoubleValue{" + "value=" + value + '}';
+        return "DoubleValue{" + "value=" + this.value + '}';
     }
 
     @Override
@@ -122,7 +120,7 @@ public class DoubleValue extends Value{
         if (other==null){return false;}
         if (other instanceof DoubleValue){
             DoubleValue otherDouble = (DoubleValue)other;
-            return this.value==otherDouble.value;
+            return this.value  == otherDouble.value;
         }
         return false;
     }
@@ -130,7 +128,7 @@ public class DoubleValue extends Value{
     @Override
     public int hashCode() {
 
-        return Objects.hash(getValue())*7;
+        return getValue().hashCode()*7;
     }
 
     @Override

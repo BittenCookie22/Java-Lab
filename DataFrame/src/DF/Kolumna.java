@@ -22,6 +22,9 @@ public class Kolumna {
 
     }
 
+    public int size(){
+        return dane.size();
+    }
     public Value zwrocObiekt(int indeks){
         return dane.get(indeks);
     }

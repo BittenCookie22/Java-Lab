@@ -1,8 +1,6 @@
 package DF;
 
-import java.util.Objects;
-
-public class FloatValue extends Value{
+public class FloatValue extends NumericValue{
     private float value;
 
     public FloatValue(float value){
@@ -124,7 +122,7 @@ public class FloatValue extends Value{
     @Override
     public int hashCode() {
 
-        return Objects.hash(getValue())*21;
+        return getValue().hashCode()*21;
     }
 
     @Override
