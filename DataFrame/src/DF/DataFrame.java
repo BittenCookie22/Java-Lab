@@ -24,11 +24,10 @@ public class DataFrame {
         ilosc_wierszy = 0; // na początku brak danych == brak wierszy
     }
 
-    public DataFrame(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
-        this.lista_typow = lista_typow;
-        this.lista_nazw = lista_nazw;
-
-        konstruktorZwyczajny(lista_nazw, lista_typow);
+    public DataFrame(String[] nazwyKolumn,Class<? extends Value>[] typyKolumn){
+        this(nazwyKolumn.length);
+        for(int i =0; i<typyKolumn.length;i++)
+            kolumny[i]=new Kolumna(nazwyKolumn[i],typyKolumn[i]);
     }
 
 //    public DataFrame(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
@@ -45,9 +44,9 @@ public class DataFrame {
 
     public DataFrame(Kolumna[] kolumny) {
         this.kolumny = kolumny;
-        ilosc_wierszy = kolumny[0].dane.size(); // liczba danych w dowolnej kolumnie, z zał mają mieć taką samą długość
+        ilosc_wierszy = kolumny[0].size(); // liczba danych w dowolnej kolumnie, z zał mają mieć taką samą długość
         for (Kolumna i : kolumny) {
-            if (ilosc_wierszy != i.dane.size()) {
+            if (ilosc_wierszy != ilosc_wierszy) {
                 throw new RuntimeException("Blad w dlugosci kolumn,kolumny nie sa rownej dlugosci!");
             }
         }
@@ -124,20 +123,21 @@ public class DataFrame {
             throw new IndexOutOfBoundsException("Niepoprawny zakres");
         }
 
-        Class<? extends Value>[] typy = new Class[kolumny.length]; //tablica na typy w nowej DF
+        Class<? extends Value>[] typy =  ( Class<? extends Value>[])(new Class[kolumny.length]); //tablica na typy w nowej DF
         String[] nazwy = new String[kolumny.length]; //tablica na nazwy w nowej DF
 
         for (int i = 0; i < kolumny.length; i++) { // wypełnianie tablic na podstawie starej DF
             typy[i] = kolumny[i].typ;
-            nazwy[i] = new String(kolumny[i].nazwa);
+            nazwy[i] = kolumny[i].nazwa;
         }
 
         DataFrame nowa_DF = new DataFrame(nazwy, typy); //nowa DF
         Value[] nowe_wiersze = new Value[kolumny.length];
 
+
         for (int i = from; i <= to; i++) {
-            for (Kolumna k : this.kolumny) {   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
-                nowe_wiersze[i] = k.dane.get(i);
+            for(int j=0;j<kolumny.length;j++) {   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
+                nowe_wiersze[j] = this.kolumny[j].dane.get(i);
             }
             nowa_DF.dodajElement(nowe_wiersze);
         }
@@ -221,21 +221,16 @@ public class DataFrame {
     public DataFrame(String path, Class<? extends Value>[] typy_kolumn, String[]nazwy_kolumn) throws IOException { // header==false
         this(typy_kolumn.length);
         boolean header = nazwy_kolumn==null;
-        for (int i =0; i<typy_kolumn.length;i++){
-            if (!header){ //jesli podano nazwy kolumn w arg, a brak ich w 1szej linii pilku
+        for(int i=0;i<typy_kolumn.length;i++)
+            kolumny[i]=new Kolumna(header? "" : nazwy_kolumn[i],typy_kolumn[i]);
 
-                    kolumny[i]=new Kolumna(nazwy_kolumn[i],(typy_kolumn[i])); //to trzeba ręcznie wczytać
-
-            }
-            else{
-                continue;
-            }
-            readingFromFileFunction(path,header);
-        }
+        readingFromFileFunction(path,header);
 
     }
 
-}
+    }
+
+
 
 
 

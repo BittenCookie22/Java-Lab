@@ -10,15 +10,16 @@ public class Kolumna {
     public Kolumna(String nazwa,  Class<? extends Value> typ){
         this.nazwa=nazwa;
         this.typ=typ;
-        dane =  new ArrayList<>(10);
+        dane =  new ArrayList<Value>();
     }
 
     public Kolumna(){};
 
     public Kolumna(Kolumna do_skopiowania){  // konstruktor kopiujący potrzebny do kopii głębokiej
+        dane = new ArrayList<Value>(do_skopiowania.dane);
         this.nazwa = new String(do_skopiowania.nazwa);
         typ = do_skopiowania.typ;
-        dane = new ArrayList<>(do_skopiowania.dane);
+
 
     }
 
