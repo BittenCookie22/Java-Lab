@@ -1,5 +1,7 @@
 package DF;
 
+import DF.Values.Value;
+
 import java.util.ArrayList;
 
 public class Kolumna {
@@ -35,6 +37,9 @@ public class Kolumna {
             this.dane.add(element);}
             else {throw new IllegalArgumentException();}
     }
+
+
+
 
 
 }

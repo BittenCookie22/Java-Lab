@@ -1,9 +1,14 @@
 package DF;
 
+import DF.Values.Value;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 public class DataFrame {
@@ -209,43 +214,123 @@ public class DataFrame {
         }
 
 
-    // else{ // trzeba zczytać typy kolumn ręcznie
+        // else{ // trzeba zczytać typy kolumn ręcznie
 
-    //}
+        //}
 
 //Close the input stream
         br.close();
-}
+    }
 
-    public DataFrame(String path, Class<? extends Value>[] typy_kolumn) throws IOException{
-        this(path,typy_kolumn,null); //nazwy kolumn są zawarte w 1szej linii pliku
+    public DataFrame(String path, Class<? extends Value>[] typy_kolumn) throws IOException {
+        this(path, typy_kolumn, null); //nazwy kolumn są zawarte w 1szej linii pliku
 
     }
-    public DataFrame(String path, Class<? extends Value>[] typy_kolumn, String[]nazwy_kolumn) throws IOException { // header==false
-        this(typy_kolumn.length);
-        boolean header = nazwy_kolumn==null;
-        for(int i=0;i<typy_kolumn.length;i++)
-            kolumny[i]=new Kolumna(header? "" : nazwy_kolumn[i],typy_kolumn[i]);
 
-        readingFromFileFunction(path,header);
+    public DataFrame(String path, Class<? extends Value>[] typy_kolumn, String[] nazwy_kolumn) throws IOException { // header==false
+        this(typy_kolumn.length);
+        boolean header = nazwy_kolumn == null;
+        for (int i = 0; i < typy_kolumn.length; i++)
+            kolumny[i] = new Kolumna(header ? "" : nazwy_kolumn[i], typy_kolumn[i]);
+
+        readingFromFileFunction(path, header);
 
     }
 
     public void addRecord(Value... values) {
-        if(values.length!=kolumny.length)
-            throw new ArrayIndexOutOfBoundsException();
-        for(int i=0;i<kolumny.length;i++)
-            if(!kolumny[i].typ.isInstance(values[i]))
-                throw new IndexOutOfBoundsException();
+        if (values.length != kolumny.length) throw new ArrayIndexOutOfBoundsException();
+        for (int i = 0; i < kolumny.length; i++)
+            if (!kolumny[i].typ.isInstance(values[i])) throw new IndexOutOfBoundsException();
 
-        int i=0;
+        int i = 0;
         ilosc_wierszy++;
-        for(Kolumna k:kolumny)
+        for (Kolumna k : kolumny)
             k.dodaj(values[i++]);
 
     }
 
+    /// -----------group by -----------
+
+    public Hashtable<Value, DataFrame> groupBy(String colname){
+        Kolumna kol  =get(colname);
+        Hashtable<Value, DataFrame> output = new Hashtable<>();
+
+        for (int i = 0; i < ilosc_wierszy; i++) {
+            Value key=kol.zwrocObiekt(i);
+            Value[] row = zwrocWiersz(i);
+            DataFrame ll = output.get(key);
+
+            if(ll!= null)
+                ll.addRecord(row);
+
+            else{
+                ll  =new SparseDataFrame(lista_nazw,zwroc_typy(),row);
+                ll.addRecord(row);
+                output.put(key,ll);
+            }
+        }
+        return output;
     }
+
+    public Grupator groupBy(String[] colname){
+        Hashtable<Value,DataFrame> initial =  groupBy(colname[0]);
+
+        LinkedList<DataFrame> lista;
+
+        if(colname.length ==1)
+            lista = new LinkedList<>(initial.values());
+        else
+            lista= new LinkedList<>();
+
+        LinkedList<DataFrame> temp= new LinkedList<>(initial.values());
+
+        for (int i = 1; i < colname.length; i++) {
+            lista.clear();
+            for(DataFrame df:temp)
+                lista.addAll(df.groupBy(colname[i]).values());
+            temp.clear();
+            temp.addAll(lista);
+        }
+
+        return new Grupator(lista);
+
+    }
+
+    public Class<? extends Value>[] zwroc_typy(){
+        Class<? extends Value>[]tablica_typow =  ( Class<? extends Value>[])(new Class[kolumny.length]);
+
+        for (int i =0;i<this.kolumny.length;i++){
+            tablica_typow[i]=kolumny[i].typ;
+        }
+        return tablica_typow;
+    }
+
+
+    class Grupator implements GroupBy{
+        private LinkedList <DataFrame> lista;
+
+
+        public Grupator (Collection<DataFrame> lista){
+            this.lista= new LinkedList<>(lista);
+        }
+        @Override
+        public DataFrame apply (Applyable funkcja){
+            DataFrame output = funkcja.apply(lista.getFirst());
+            boolean first=true;
+             for (DataFrame df:lista){
+                 if(first){
+                     first=false;
+                     continue;
+                 }
+                 output.dodajElement(funkcja.apply(df).zwrocWiersz(0));
+             }
+            return output;
+        }
+
+
+    }
+
+}
 
 
 

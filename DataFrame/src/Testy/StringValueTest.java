@@ -1,7 +1,7 @@
 package Testy;
 
-import DF.StringValue;
-import DF.Value;
+import DF.Values.StringValue;
+import DF.Values.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

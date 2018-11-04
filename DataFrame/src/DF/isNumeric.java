@@ -1,5 +1,10 @@
 package DF;
 
+import DF.Values.DoubleValue;
+import DF.Values.FloatValue;
+import DF.Values.IntegerValue;
+import DF.Values.Value;
+
 public  class isNumeric {
      Value wartosc;
 

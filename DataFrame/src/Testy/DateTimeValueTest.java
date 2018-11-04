@@ -1,7 +1,7 @@
 package Testy;
 
-import DF.DateTimeValue;
-import DF.Value;
+import DF.Values.DateTimeValue;
+import DF.Values.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

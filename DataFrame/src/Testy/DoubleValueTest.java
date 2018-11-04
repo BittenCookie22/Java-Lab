@@ -1,7 +1,7 @@
 package Testy;
 
-import DF.DoubleValue;
-import DF.Value;
+import DF.Values.DoubleValue;
+import DF.Values.Value;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
