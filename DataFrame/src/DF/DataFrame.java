@@ -292,7 +292,7 @@ public class DataFrame {
             temp.addAll(lista);
         }
 
-        return new Grupator(lista);
+        return new Grupator(lista,colname);
 
     }
 
@@ -308,29 +308,112 @@ public class DataFrame {
 
     class Grupator implements GroupBy{
         private LinkedList <DataFrame> lista;
+        private String[]  kluczowe_nazwy_kolumn;
+       private Kolumna[] kluczowe_kolumny;
+       private String[] nazwy_kolumn_z_wartosciami;
 
 
-        public Grupator (Collection<DataFrame> lista){
+        public Grupator (Collection<DataFrame> lista,String[]kluczowe_nazwy_kolumn){
             this.lista= new LinkedList<>(lista);
+            this.kluczowe_nazwy_kolumn=kluczowe_nazwy_kolumn;
+            this.kluczowe_kolumny=new Kolumna[kluczowe_nazwy_kolumn.length];
+            String[] allNames = this.lista.getFirst().lista_nazw;
+            nazwy_kolumn_z_wartosciami= new String[allNames.length-kluczowe_nazwy_kolumn.length];
+
+            int k=0;
+            outer:
+            for (String colname : allNames){
+                for(String kluczowa_nazwa:kluczowe_nazwy_kolumn){
+                    if(kluczowa_nazwa.equals(colname)){
+                        continue outer;
+                    }
+                }
+                k++;
+                nazwy_kolumn_z_wartosciami[k]=colname;
+            }
+
+            for (int i=0;i<kluczowe_nazwy_kolumn.length;i++){
+                Kolumna tmp = this.lista.getFirst().get(kluczowe_nazwy_kolumn[i]);
+                kluczowe_kolumny[i]=new Kolumna(tmp.nazwa,tmp.typ);
+            }
+
+            for (DataFrame df : this.lista) {
+                for (int j = 0; j < kluczowe_kolumny.length; j++) {
+                       this.kluczowe_kolumny[j].dodaj(df.get(nazwy_kolumn_z_wartosciami[j]).zwrocObiekt(0));
+                }
+            }
         }
+
+
         @Override
         public DataFrame apply (Applyable funkcja){
-            DataFrame output = funkcja.apply(lista.getFirst());
+            DataFrame output = null;
             boolean first=true;
              for (DataFrame df:lista){
                  if(first){
                      first=false;
                      continue;
                  }
-                 output.dodajElement(funkcja.apply(df).zwrocWiersz(0));
-             }
+
+
+                 for (int grupa = 0; grupa < this.lista.size(); grupa++) {
+
+
+
+                     DataFrame tmp = funkcja.apply(df.get(nazwy_kolumn_z_wartosciami,false));
+
+
+                     //inicjalizacja DF output tak żeby miał wszystkie nazwy klumn łacznie z kluczowymi i ich typy
+                     if(output==null){
+                         String []temp_names=tmp.lista_nazw;
+                         String[] output_colnames= new String[temp_names.length+kluczowe_nazwy_kolumn.length];
+
+                         Class<? extends Value>[] temp_types = tmp.zwroc_typy();
+                         Class<? extends Value>[] output_types=new Class[temp_names.length+kluczowe_nazwy_kolumn.length];
+
+                         for (int k = 0; k < output_colnames.length ; k++) {
+                             output_colnames[k] =( k<kluczowe_nazwy_kolumn.length)? kluczowe_nazwy_kolumn[k]:
+                                                                    temp_names[k-kluczowe_nazwy_kolumn.length];
+
+
+                             output_types[k] =( k<kluczowe_nazwy_kolumn.length)? kluczowe_kolumny[k].typ:
+                                     temp_types[k-kluczowe_nazwy_kolumn.length];
+
+                         }
+                         output= new DataFrame(output_colnames,output_types);
+                     }
+
+                     //perzisanie zawarotosci z temp jesli cos tam jest
+                     if(tmp.size()>0){
+                         Value output_row[] = new Value[output.iloscKolumn()];
+                         for (int i = 0; i <kluczowe_kolumny.length; i++) { //wpisanie identyfikatora wiersza
+                             output_row[i]=kluczowe_kolumny[i].zwrocObiekt(grupa);
+                         }
+                         for (int j = 0; j < tmp.size();j++) {
+                             Value[] tmp_row =tmp.zwrocWiersz(j);
+                             for (int k = 0; k < tmp.iloscKolumn(); k++) {
+                                 output_row[k - kluczowe_kolumny.length] = tmp_row[k];
+                             }
+
+                             output.dodajElement(output_row);
+                         }
+
+                     }
+
+                     }
+                 }
             return output;
+             }
+
         }
 
-
+    public int iloscKolumn() {
+        return kolumny.length;
     }
 
+
 }
+
 
 
 

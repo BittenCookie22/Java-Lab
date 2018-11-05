@@ -18,12 +18,13 @@ public class ApplyMean implements Applyable  {
                 Kolumna kol = df.get(df.lista_nazw[i]);
                 if (NumericValue.class.isAssignableFrom(kol.typ)) {
                     Value suma = srednie[i];
-                    for (int j = 0; j < kol.size(); j++) {
+                    for (int j = 1 ;j < kol.size(); j++) {
                         suma = suma.add(kol.dane.get(j));
                     }
                     srednie[i] = suma.div(new DoubleValue(size));
 
                 }
+
 
             }
             output.dodajElement(srednie);

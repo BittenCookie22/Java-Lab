@@ -11,9 +11,12 @@ public class ApplyVar  implements Applyable{
 
         int size = df.size();
         Value[] var = df.zwrocWiersz(0);
+        Applyable a =new ApplyMean();
 
+
+        DataFrame mean = a.apply(df);
         //-----wyliczenie średniej--------
-        Value[] srednie = df.zwrocWiersz(0);
+        Value[] srednie = mean.zwrocWiersz(0);
 
         if (size>0) {
             for (int i = 0; i < size; i++) {
@@ -29,13 +32,13 @@ public class ApplyVar  implements Applyable{
         }
 
         if(size>0){
-            for (int i =0; i<size;i++){
+            for (int i =0; i<df.kolumny.length;i++){
                 Kolumna kol =  df.get(df.lista_nazw[i]);
                 if (NumericValue.class.isAssignableFrom(kol.typ)){
                     Value roznica;
-                    Value suma; //???
+                    Value suma= new DoubleValue(0.0); //???
                     for(int j=0;j<kol.size();j++){
-                        Value roznica = kol.dane.get(j).sub(srednie[i]).mul(kol.dane.get(j).sub(srednie[i]));
+                        roznica = kol.zwrocObiekt(j).sub(srednie[i]).mul(kol.zwrocObiekt(j).sub(mean[i]));
                         suma = suma.add(roznica);
                     }
                     var[i] = suma.div(new DoubleValue((size)));
