@@ -20,7 +20,7 @@ public class ApplySum implements Applyable {
         for (int i = 0; i < df_types.length ; i++) {
             if (NumericValue.class.isAssignableFrom(df_types[i])){
                 types.add(df_types[i]);
-                colnames.add(colnames.get(i));
+                colnames.add(df_names[i]);
             }
         }
 
@@ -32,10 +32,10 @@ public class ApplySum implements Applyable {
 
         if (size > 0) {
             for (int i = 0; i < output_colnames.length; i++) {
-                Kolumna kol = df.get(output_colnames[i]);
+                Kolumna kol = output.get(output_colnames[i]);
                     Value suma = kol.zwrocObiekt(0);
                     for (int j = 1; j < kol.dane.size(); j++) {
-                        suma = suma.add(kol.dane.get(j));
+                        suma = suma.add(kol.zwrocObiekt(j));
                     }
                     sum[i]=suma;
             }

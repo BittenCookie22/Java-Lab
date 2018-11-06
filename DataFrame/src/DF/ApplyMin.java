@@ -2,27 +2,27 @@ package DF;
 
 import DF.Values.Value;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 
 public class ApplyMin implements Applyable {
 
 
     @Override
     public DataFrame apply(DataFrame df) {
+
         DataFrame output = new DataFrame(df.lista_nazw, df.zwroc_typy());
-        LinkedList<Integer> bannedColumn = new LinkedList<>(); // pojemnik na nieporównywalne dane
+        HashSet<Integer> bannedColumn = new HashSet<>(); // pojemnik na nieporównywalne dane np. daty
         int size = df.size();
 
         if (size > 0) {
-            Value[] min = df.zwrocWiersz(0);
+            Value[] min = output.zwrocWiersz(0);
             for (int i = 0; i < size; i++) {
-                Value[] row = df.zwrocWiersz(i);
+                Value[] row = output.zwrocWiersz(i);
                 for (int kolumna = 0; kolumna < row.length; kolumna++) {
 
 
-                    if (bannedColumn.contains(kolumna)) {
-                        continue;
-                    }
+                    if (bannedColumn.contains(kolumna)) {continue;}
+
                     try {
                         if (min[kolumna].gte(row[kolumna])) {
                             min[kolumna] = row[kolumna];
