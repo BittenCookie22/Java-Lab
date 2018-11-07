@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 public class DataFrame {
     Kolumna[] kolumny;
     int ilosc_wierszy;
-    String[] lista_nazw;
+    public String[] lista_nazw;
     Class<? extends Value>[] lista_typow;
 
 //-----------------Konstruktory DataFrame ------------------------------
@@ -54,7 +54,7 @@ public class DataFrame {
         this.kolumny = kolumny;
         ilosc_wierszy = kolumny[0].size(); // liczba danych w dowolnej kolumnie, z zał mają mieć taką samą długość
         for (Kolumna i : kolumny) {
-            if (ilosc_wierszy != ilosc_wierszy) {
+            if (i.size() != ilosc_wierszy) {
                 throw new RuntimeException("Blad w dlugosci kolumn,kolumny nie sa rownej dlugosci!");
             }
         }
@@ -76,9 +76,7 @@ public class DataFrame {
         lista_typow = new Class[ilosc_kolumn];
     }
 
-    // public DataFrame(String path,String [] tablica_typow, boolean header){//jesli header==true oznacz to że pierwsza linia w pliku to nagłówek. Jeśli header==false to znaczy że należy podać kolejny argument z nazwami kolumn. Domyślnie header==true
 
-    //}
 
 // -----------------------dodajElement gdzie element to cały wiersz z danymi--------------------
 
@@ -264,7 +262,7 @@ public class DataFrame {
                 ll.addRecord(row);
 
             else{
-                ll  =new SparseDataFrame(lista_nazw,zwroc_typy(),row);
+                ll  =new SparseDataFrame(zwroc_nazwy(),zwroc_typy(),row);
                 ll.addRecord(row);
                 output.put(key,ll);
             }
@@ -305,6 +303,15 @@ public class DataFrame {
         return tablica_typow;
     }
 
+    public String [] zwroc_nazwy(){
+        String[]tablica_nazw =  new String[kolumny.length];
+
+        for (int i =0;i<this.kolumny.length;i++){
+            tablica_nazw[i]=kolumny[i].nazwa;
+        }
+        return tablica_nazw;
+    }
+
 
     class Grupator implements GroupBy{
         private LinkedList <DataFrame> lista;
@@ -317,7 +324,7 @@ public class DataFrame {
             this.lista= new LinkedList<>(lista);
             this.kluczowe_nazwy_kolumn=kluczowe_nazwy_kolumn;
             this.kluczowe_kolumny=new Kolumna[kluczowe_nazwy_kolumn.length];
-            String[] allNames = this.lista.getFirst().lista_nazw;
+            String[] allNames = this.lista.getFirst().zwroc_nazwy();
             nazwy_kolumn_z_wartosciami= new String[allNames.length-kluczowe_nazwy_kolumn.length];
 
             int k=0;
@@ -328,8 +335,9 @@ public class DataFrame {
                         continue outer;
                     }
                 }
-                k++;
+
                 nazwy_kolumn_z_wartosciami[k]=colname;
+                k++;
             }
 
             for (int i=0;i<kluczowe_nazwy_kolumn.length;i++){
@@ -339,7 +347,7 @@ public class DataFrame {
 
             for (DataFrame df : this.lista) {
                 for (int j = 0; j < kluczowe_kolumny.length; j++) {
-                       this.kluczowe_kolumny[j].dodaj(df.get(nazwy_kolumn_z_wartosciami[j]).zwrocObiekt(0));
+                       this.kluczowe_kolumny[j].dodaj(df.get(kluczowe_nazwy_kolumn[j]).zwrocObiekt(0));
                 }
             }
         }
@@ -348,24 +356,14 @@ public class DataFrame {
         @Override
         public DataFrame apply (Applyable funkcja){
             DataFrame output = null;
-            boolean first=true;
-             for (DataFrame df:lista){
-                 if(first){
-                     first=false;
-                     continue;
-                 }
-
-
-                 for (int grupa = 0; grupa < this.lista.size(); grupa++) {
-
-
-
-                     DataFrame tmp = funkcja.apply(df.get(nazwy_kolumn_z_wartosciami,false));
+            for (int grupa = 0; grupa < this.lista.size(); grupa++) {
+                DataFrame df = lista.get(grupa);
+                 DataFrame tmp = funkcja.apply(df.get(nazwy_kolumn_z_wartosciami,false));
 
 
                      //inicjalizacja DF output tak żeby miał wszystkie nazwy klumn łacznie z kluczowymi i ich typy
                      if(output==null){
-                         String []temp_names=tmp.lista_nazw;
+                         String []temp_names=tmp.zwroc_nazwy();
                          String[] output_colnames= new String[temp_names.length+kluczowe_nazwy_kolumn.length];
 
                          Class<? extends Value>[] temp_types = tmp.zwroc_typy();
@@ -392,7 +390,7 @@ public class DataFrame {
                          for (int j = 0; j < tmp.size();j++) {
                              Value[] tmp_row =tmp.zwrocWiersz(j);
                              for (int k = 0; k < tmp.iloscKolumn(); k++) {
-                                 output_row[k - kluczowe_kolumny.length] = tmp_row[k];
+                                 output_row[k + kluczowe_kolumny.length] = tmp_row[k];
                              }
 
                              output.dodajElement(output_row);
@@ -401,7 +399,7 @@ public class DataFrame {
                      }
 
                      }
-                 }
+
             return output;
              }
 
@@ -411,6 +409,23 @@ public class DataFrame {
         return kolumny.length;
     }
 
+
+    @Override
+    public String toString() {
+        StringBuilder s=new StringBuilder();
+        String[] str;
+        for(Kolumna k:kolumny){
+            str=k.typ.getTypeName().split("\\.");
+            s.append("|").append(k.nazwa).append(":").append(str[str.length-1]);
+        }
+        s.append("|\n");
+        for(int i=0;i<ilosc_wierszy;i++){
+            for(Kolumna k:kolumny)
+                s.append("|").append(k.zwrocObiekt(i).toString());
+            s.append("|\n");
+        }
+        return s.toString();
+    }
 
 }
 

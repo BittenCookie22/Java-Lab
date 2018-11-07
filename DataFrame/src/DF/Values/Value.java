@@ -2,7 +2,11 @@ package DF.Values;
 
 public abstract class Value implements Cloneable{
     public abstract Object getValue();
-    public abstract String toString();
+
+    public  String toString(){
+        return getValue().toString();
+    }
+
     public abstract Value add(Value val);
     public abstract Value sub(Value val);
     public abstract Value mul(Value val);

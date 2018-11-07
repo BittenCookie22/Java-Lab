@@ -1,6 +1,7 @@
 package DF;
 
 import DF.Values.DoubleValue;
+import DF.Values.NumericValue;
 import DF.Values.Value;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class ApplyMean implements Applyable  {
         ArrayList<Class<? extends Value>> types = new ArrayList<>();
 
         Class<? extends Value> []df_types = df.zwroc_typy();
-        String[] df_names = df.lista_nazw;
+        String[] df_names = df.zwroc_nazwy();
 
         for (int i = 0; i < df_types.length ; i++) {
             if (NumericValue.class.isAssignableFrom(df_types[i])){
@@ -24,19 +25,20 @@ public class ApplyMean implements Applyable  {
             }
         }
 
-        DataFrame output = new DataFrame((String [] )colnames.toArray(), (Class<? extends Value>[])types.toArray());
+        DataFrame output = new DataFrame(colnames.toArray(new String[0]),types.toArray(new Class[0]));
 
         int size = output.iloscKolumn();
-        Value[] srednie = df.zwrocWiersz(0);
+        Value[] srednie = new Value[size];
 
         if (size>0) {
             for (int i = 0; i < size; i++) {
-                Kolumna kol = df.get(df.lista_nazw[i]);
-                    Value suma = srednie[i];
+                String[] lista_nazw = output.zwroc_nazwy();
+                Kolumna kol = df.get(lista_nazw[i]);
+                    Value suma = kol.zwrocObiekt(0);
                     for (int j = 1 ;j < kol.size(); j++) {
                         suma = suma.add(kol.zwrocObiekt(j));
                     }
-                    srednie[i] = suma.div(new DoubleValue(output.size()));
+                    srednie[i] = suma.div(new DoubleValue(kol.size()));
             }
             output.dodajElement(srednie);
         }

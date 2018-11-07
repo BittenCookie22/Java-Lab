@@ -146,6 +146,11 @@ public class SparseDataFrame extends DataFrame {
             ilosc_wierszy=0;
         }
 
+        @Override
+        public int size() {
+            return ilosc_wierszy;
+        }
+
         public SparseKolumna(SparseKolumna sprsKol){
             super(sprsKol);
             this.hide=sprsKol.hide;
@@ -197,13 +202,15 @@ public class SparseDataFrame extends DataFrame {
             kolumny[i]=new SparseKolumna(lista_nazw[i],lista_typow[i],hide[i]);
         }
     }
+
     public SparseDataFrame(SparseKolumna[] kolumny) {
         super(kolumny);
+        ilosc_wierszy=kolumny[0].size();
     }
 
     public SparseDataFrame(DataFrame DF, Value[] hide) {
-        super(DF.lista_nazw, DF.lista_typow);
-        String []lista_kolumn = DF.lista_nazw;
+        super(DF.zwroc_nazwy(), DF.lista_typow);
+        String []lista_kolumn = DF.zwroc_nazwy();
         Class<? extends Value> [] lista_typow = DF.lista_typow;
             for (int i = 0; i < DF.lista_typow.length; i++) {
                 kolumny[i]=new SparseKolumna(lista_kolumn[i],lista_typow[i],hide[i]);
@@ -228,8 +235,8 @@ public class SparseDataFrame extends DataFrame {
         String []nazwy = new String[SPD.kolumny.length];
         Class<? extends Value> [] typy = new  Class[SPD.kolumny.length];
 
-        nazwy = SPD.lista_nazw;
-        typy = SPD.lista_typow;
+        nazwy = SPD.zwroc_nazwy();
+        typy = SPD.zwroc_typy();
 
         DataFrame df =  new DataFrame(nazwy,typy);
 
@@ -253,7 +260,7 @@ public class SparseDataFrame extends DataFrame {
                 return (SparseKolumna)i;
             }
         }
-        throw new NoSuchElementException("Nie ma takiej kolumny" + colname + "w tej Ramce Danych");
+        throw new NoSuchElementException("Nie ma takiej kolumny" + " " + colname + "w tej Ramce Danych");
 
     }
 
@@ -263,8 +270,7 @@ public class SparseDataFrame extends DataFrame {
 
         for(int i=0;i<cols.length;i++){
             if(copy){
-                Kolumna tmp = new Kolumna(get(cols[i]));
-                kolumny[i]=(SparseKolumna)tmp;}
+                kolumny[i]=(new SparseKolumna(get(cols[i]) ));}
             else{
                 kolumny[i]= get(cols[i]);}
         }

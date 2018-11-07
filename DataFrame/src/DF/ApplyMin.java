@@ -10,14 +10,14 @@ public class ApplyMin implements Applyable {
     @Override
     public DataFrame apply(DataFrame df) {
 
-        DataFrame output = new DataFrame(df.lista_nazw, df.zwroc_typy());
+        DataFrame output = new DataFrame(df.zwroc_nazwy(), df.zwroc_typy());
         HashSet<Integer> bannedColumn = new HashSet<>(); // pojemnik na nieporównywalne dane np. daty
         int size = df.size();
 
         if (size > 0) {
-            Value[] min = output.zwrocWiersz(0);
-            for (int i = 0; i < size; i++) {
-                Value[] row = output.zwrocWiersz(i);
+            Value[] min = df.zwrocWiersz(0);
+            for (int i = 1; i < size; i++) {
+                Value[] row = df.zwrocWiersz(i);
                 for (int kolumna = 0; kolumna < row.length; kolumna++) {
 
 
@@ -37,7 +37,7 @@ public class ApplyMin implements Applyable {
         if (bannedColumn.size() == output.iloscKolumn()) {
             throw new RuntimeException("nope");
         }
-        String[] output_colnames = output.lista_nazw;
+        String[] output_colnames = output.zwroc_nazwy();
         String[] colnames = new String[output.iloscKolumn() - bannedColumn.size()];
 
         int j = 0;

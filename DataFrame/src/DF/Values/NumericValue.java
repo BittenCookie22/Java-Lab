@@ -1,6 +1,4 @@
-package DF;
-
-import DF.Values.Value;
+package DF.Values;
 
 public abstract class NumericValue extends Value {
     @Override

@@ -9,7 +9,7 @@ public class ApplyMax implements Applyable {
 
     @Override
     public DataFrame apply(DataFrame df) {
-        DataFrame output = new DataFrame(df.lista_nazw,df.zwroc_typy());
+        DataFrame output = new DataFrame(df.zwroc_nazwy(),df.zwroc_typy());
         int size = df.size();
         HashSet<Integer> bannedColumns = new HashSet<>();
 
@@ -36,7 +36,7 @@ public class ApplyMax implements Applyable {
              output.dodajElement(max);
          }
 
-             String []  output_colnames = output.lista_nazw;
+             String []  output_colnames = output.zwroc_nazwy();
              String [] colnames = new String [output_colnames.length-bannedColumns.size()];
 
              if(bannedColumns.size() == output_colnames.length ){throw new RuntimeException("nope");}

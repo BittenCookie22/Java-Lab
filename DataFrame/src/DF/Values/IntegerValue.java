@@ -1,8 +1,5 @@
 package DF.Values;
 
-import DF.NumericValue;
-import DF.Values.Value;
-
 public class IntegerValue extends NumericValue {
     private int value;
 
@@ -17,10 +14,10 @@ public class IntegerValue extends NumericValue {
 
     public IntegerValue(){};
 
-    @Override
-    public String toString() {
-        return "IntegerValue{" + "value=" + value + '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "IntegerValue{" + "value=" + value + '}';
+//    }
 
     @Override
     public Integer getValue() {

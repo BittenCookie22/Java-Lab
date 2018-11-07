@@ -17,6 +17,16 @@ public class Kolumna {
 
     public Kolumna(){};
 
+    @Override
+    public String toString() {
+
+        StringBuilder s=new StringBuilder();
+        s.append(nazwa).append(" : ").append(typ.toGenericString()).append('\n');
+        for(Value o:dane)
+            s.append(o.toString()).append('\n');
+        return s.toString();
+    }
+
     public Kolumna(Kolumna do_skopiowania){  // konstruktor kopiujący potrzebny do kopii głębokiej
         dane = new ArrayList<Value>(do_skopiowania.dane);
         this.nazwa = new String(do_skopiowania.nazwa);
@@ -28,6 +38,7 @@ public class Kolumna {
     public int size(){
         return dane.size();
     }
+
     public Value zwrocObiekt(int indeks){
         return dane.get(indeks);
     }

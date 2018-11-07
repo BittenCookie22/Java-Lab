@@ -1,8 +1,5 @@
 package DF.Values;
 
-import DF.NumericValue;
-import DF.Values.Value;
-
 public class FloatValue extends NumericValue {
     private float value;
 
@@ -17,10 +14,10 @@ public class FloatValue extends NumericValue {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return "FloatValue{" + "value=" + value + '}';
-    }
+    //@Override
+    //public String toString() {
+      //  return "FloatValue{" + "value=" + value + '}';
+   // }
 
     @Override
     public FloatValue add(Value val) throws UnsupportedOperationException {

@@ -1,7 +1,5 @@
 package DF.Values;
 
-import DF.Values.Value;
-
 import java.time.LocalDateTime;
 
 public class DateTimeValue extends Value {
@@ -163,7 +161,11 @@ public class DateTimeValue extends Value {
 
     @Override
     public DateTimeValue create(String s){
-        return new DateTimeValue(LocalDateTime.parse(s));
+        if(s.contains("T")) {
+            return new DateTimeValue(LocalDateTime.parse(s));
+        }
+        String output = s+"T00:00:00";
+        return new DateTimeValue(LocalDateTime.parse(output));
     }
 }
 

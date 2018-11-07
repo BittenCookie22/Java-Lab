@@ -1,7 +1,5 @@
 package DF.Values;
 
-import DF.Values.Value;
-
 public class StringValue  extends Value {
     private String value;
 
@@ -18,10 +16,10 @@ public class StringValue  extends Value {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return this.value;
-    }
+//    @Override
+//    public String toString() {
+//        return this.value;
+//    }
 
     @Override
     public StringValue add(Value value){

@@ -1,8 +1,5 @@
 package DF.Values;
 
-import DF.NumericValue;
-import DF.Values.Value;
-
 public class DoubleValue extends NumericValue {
     private double value;
 
@@ -17,10 +14,10 @@ public class DoubleValue extends NumericValue {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return "DoubleValue{" + "value=" + this.value + '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "DoubleValue{" + "value=" + this.value + '}';
+//    }
 
     @Override
     public DoubleValue add(Value val) throws UnsupportedOperationException {
