@@ -6,10 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class DataFrame {
     Kolumna[] kolumny;
@@ -91,7 +88,7 @@ public class DataFrame {
         }
     }
 
-    //------------ zwrocWiersz - zwraca wiersz o indeksie i ------------------------------
+    //------------ zwrocWiersz - zwraca wiersz o indeksie i ------- + gettery-----------------------
     public Value[] zwrocWiersz(int i) {
         Value[] wiersz = new Value[kolumny.length];
         int j = 0;
@@ -99,6 +96,24 @@ public class DataFrame {
             wiersz[j++] = k.zwrocObiekt(i);
 
         return wiersz;
+    }
+
+    public Class<? extends Value>[] zwroc_typy(){
+        Class<? extends Value>[]tablica_typow =  ( Class<? extends Value>[])(new Class[kolumny.length]);
+
+        for (int i =0;i<this.kolumny.length;i++){
+            tablica_typow[i]=kolumny[i].typ;
+        }
+        return tablica_typow;
+    }
+
+    public String [] zwroc_nazwy(){
+        String[]tablica_nazw =  new String[kolumny.length];
+
+        for (int i =0;i<this.kolumny.length;i++){
+            tablica_nazw[i]=kolumny[i].nazwa;
+        }
+        return tablica_nazw;
     }
 
     // -------------------funkcje zadane w lab1-------------------------
@@ -249,9 +264,9 @@ public class DataFrame {
 
     /// -----------group by -----------
 
-    public Hashtable<Value, DataFrame> groupBy(String colname){
+    public TreeMap<Value, DataFrame> groupBy(String colname){
         Kolumna kol  =get(colname);
-        Hashtable<Value, DataFrame> output = new Hashtable<>();
+        TreeMap<Value, DataFrame> output = new TreeMap<>();
 
         for (int i = 0; i < ilosc_wierszy; i++) {
             Value key=kol.zwrocObiekt(i);
@@ -267,11 +282,12 @@ public class DataFrame {
                 output.put(key,ll);
             }
         }
+
         return output;
     }
 
     public Grupator groupBy(String[] colname){
-        Hashtable<Value,DataFrame> initial =  groupBy(colname[0]);
+        TreeMap<Value,DataFrame> initial =  groupBy(colname[0]);
 
         LinkedList<DataFrame> lista;
 
@@ -294,23 +310,7 @@ public class DataFrame {
 
     }
 
-    public Class<? extends Value>[] zwroc_typy(){
-        Class<? extends Value>[]tablica_typow =  ( Class<? extends Value>[])(new Class[kolumny.length]);
 
-        for (int i =0;i<this.kolumny.length;i++){
-            tablica_typow[i]=kolumny[i].typ;
-        }
-        return tablica_typow;
-    }
-
-    public String [] zwroc_nazwy(){
-        String[]tablica_nazw =  new String[kolumny.length];
-
-        for (int i =0;i<this.kolumny.length;i++){
-            tablica_nazw[i]=kolumny[i].nazwa;
-        }
-        return tablica_nazw;
-    }
 
 
     class Grupator implements GroupBy{

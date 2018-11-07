@@ -2,7 +2,7 @@ package DF.Values;
 
 import java.time.LocalDateTime;
 
-public class DateTimeValue extends Value {
+public class DateTimeValue extends Value implements Comparable<DateTimeValue>{
     private LocalDateTime data;  //rok,miesiąc,dzień,godzina,minuta
 
     /**
@@ -166,6 +166,12 @@ public class DateTimeValue extends Value {
         }
         String output = s+"T00:00:00";
         return new DateTimeValue(LocalDateTime.parse(output));
+    }
+
+
+    @Override
+    public int compareTo(DateTimeValue obj) {
+        return data.compareTo(obj.data);
     }
 }
 

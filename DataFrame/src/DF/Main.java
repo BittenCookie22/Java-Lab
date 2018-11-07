@@ -18,17 +18,16 @@ public class Main {
 
 
         // TEST DLA JEDNEGO KLUCZA
-
-     //   DataFrame tmp2 = new DataFrame("groupby.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
+        //DataFrame tmp2 = new DataFrame("groupby.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
       //  DataFrame tmp4 = new DataFrame("tg.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
 
-//        System.out.println(tmp2.toString());
+      //System.out.println(tmp2.toString());
 
       //  DataFrame.Grupator group = tmp2.groupBy(new String []{"id"});
-      // System.out.println(group.sum());
-//      System.out.println(group.max());
-//       System.out.println(group.min());
-       // System.out.println(group.mean());
+       //System.out.println(group.sum());
+    // System.out.println(group.max());
+     //  System.out.println(group.min());
+      //  System.out.println(group.mean());
 //       System.out.println(group.var());
 //        System.out.println(group.std());
 
@@ -39,7 +38,7 @@ public class Main {
         DataFrame tmp3 = new DataFrame("groubymulti.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
 
         DataFrame.Grupator group1 = tmp3.groupBy(new String []{"id","date"});
-       // System.out.println(group1.min());
+        System.out.println(group1.min());
         //System.out.println(group1.max());
         // System.out.println(group1.sum());
         // System.out.println(group1.mean());

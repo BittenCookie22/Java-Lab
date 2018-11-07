@@ -1,6 +1,6 @@
 package DF.Values;
 
-public class StringValue  extends Value {
+public class StringValue  extends Value implements Comparable<StringValue>{
     private String value;
 
     public StringValue(String value){
@@ -111,5 +111,10 @@ public class StringValue  extends Value {
     @Override
     public StringValue create(String s){
         return new StringValue(s);
+    }
+
+    @Override
+    public int compareTo(StringValue obj) {
+        return value.compareTo(obj.value);
     }
 }

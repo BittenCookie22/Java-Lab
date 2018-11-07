@@ -26,7 +26,7 @@ public class SparseDataFrame extends DataFrame {
         }
 
 
-        public Value zwrocObiekt1(){
+        public Value zwrocObiekt(){
              return this.wartosc;
         }
 
