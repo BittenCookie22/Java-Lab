@@ -1,6 +1,6 @@
 package DF.Values;
 
-public class FloatValue extends NumericValue {
+public class FloatValue extends NumericValue  implements Comparable<FloatValue>{
     private float value;
 
     public FloatValue(float value){
@@ -14,15 +14,15 @@ public class FloatValue extends NumericValue {
         return value;
     }
 
-    //@Override
-    //public String toString() {
-      //  return "FloatValue{" + "value=" + value + '}';
-   // }
+//    @Override
+//    public String toString() {
+//        return "FloatValue{" + "value=" + value + '}';
+//    }
 
     @Override
     public FloatValue add(Value val) throws UnsupportedOperationException {
         if(val instanceof NumericValue){
-            return new FloatValue((float)((NumericValue)val).getValue().doubleValue()+this.value);
+            return new FloatValue((float)((NumericValue)val).getValue().floatValue()+this.value);
         }
         else{
             throw new UnsupportedOperationException();
@@ -32,7 +32,7 @@ public class FloatValue extends NumericValue {
     @Override
     public FloatValue sub(Value val) throws UnsupportedOperationException {
         if(val instanceof NumericValue){
-            return new FloatValue((float)(this.value-((NumericValue)val).getValue().doubleValue()));
+            return new FloatValue((float)(this.value-((NumericValue)val).getValue().floatValue()));
         }
         else{
             throw new UnsupportedOperationException();
@@ -42,7 +42,7 @@ public class FloatValue extends NumericValue {
 
     @Override
     public  boolean eq(Value val){
-        if ((Math.abs(this.value-((NumericValue)val).getValue().doubleValue())< 0.000001)){ // porównywanie liczb zmiennoprzecinkowych
+        if ((Math.abs(this.value-((NumericValue)val).getValue().floatValue())< 0.000001)){ // porównywanie liczb zmiennoprzecinkowych
             return true;
         }
         else{
@@ -53,7 +53,7 @@ public class FloatValue extends NumericValue {
     @Override
     public  FloatValue mul(Value val){
         if(val instanceof NumericValue){
-            return new FloatValue((float)(this.value*((NumericValue)val).getValue().doubleValue()));
+            return new FloatValue((float)(this.value*((NumericValue)val).getValue().floatValue()));
         }
         else{
             throw new UnsupportedOperationException();
@@ -61,9 +61,9 @@ public class FloatValue extends NumericValue {
     }
     @Override
     public  FloatValue div(Value val){
-        if(val instanceof FloatValue ){
+        if(val instanceof NumericValue ){
             //  if( ((IntegerValue)val).value)!=0){
-            return new FloatValue((float)(this.value/((NumericValue)val).getValue().doubleValue()));}
+            return new FloatValue((float)(this.value/((NumericValue)val).getValue().floatValue()));}
 
         else{
             throw new UnsupportedOperationException();
@@ -73,7 +73,7 @@ public class FloatValue extends NumericValue {
     public  FloatValue pow(Value val){
         FloatValue tmp = new FloatValue(0);
         if (val instanceof NumericValue){
-            tmp=new FloatValue ((float)(Math.pow(this.value,((NumericValue)val).getValue().doubleValue())));
+            tmp=new FloatValue ((float)(Math.pow(this.value,((NumericValue)val).getValue().floatValue())));
         }
         return tmp;
     }
@@ -81,7 +81,7 @@ public class FloatValue extends NumericValue {
 
     @Override
     public  boolean lte(Value val){
-        if (this.value <= (((NumericValue)val).getValue().doubleValue())){
+        if (this.value <= (((NumericValue)val).getValue().floatValue())){
             return true;
         }
         else{
@@ -91,7 +91,7 @@ public class FloatValue extends NumericValue {
 
     @Override
     public  boolean gte(Value val){
-        if (this.value >= (((NumericValue)val).getValue().doubleValue())){
+        if (this.value >= (((NumericValue)val).getValue().floatValue())){
             return true;
         }
         else{
@@ -101,7 +101,7 @@ public class FloatValue extends NumericValue {
 
     @Override
     public  boolean neq(Value val){
-        if (!(Math.abs(this.value-((NumericValue)val).getValue().doubleValue())< 0.000001)){ // porównywanie liczb zmiennoprzecinkowych
+        if (!(Math.abs(this.value-((NumericValue)val).getValue().floatValue())< 0.000001)){ // porównywanie liczb zmiennoprzecinkowych
             return true;
         }
         else{
@@ -128,5 +128,11 @@ public class FloatValue extends NumericValue {
     @Override
     public FloatValue create(String s){
         return new FloatValue(Float.parseFloat(s));
+    }
+
+
+    @Override
+    public int compareTo(FloatValue obj){
+        return Float.compare(value,obj.value);
     }
 }

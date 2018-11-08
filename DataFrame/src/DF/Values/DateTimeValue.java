@@ -120,7 +120,7 @@ public class DateTimeValue extends Value implements Comparable<DateTimeValue>{
     @Override
     public boolean lte(Value val){  //isAfter- Checks if this date-time is after the specified date-time.
         if (val instanceof DateTimeValue){
-            if(this.data.isAfter(((DateTimeValue)val).data)){
+            if(this.data.isBefore(((DateTimeValue)val).data)){
                 return true;
             }else{return false;}
         }
@@ -135,7 +135,7 @@ public class DateTimeValue extends Value implements Comparable<DateTimeValue>{
     @Override
     public boolean gte(Value val){
         if (val instanceof DateTimeValue){
-            if((this.data.isBefore(((DateTimeValue)val).data))){
+            if((this.data.isAfter(((DateTimeValue)val).data))){
                 return true;
             }else{return false;}
         }

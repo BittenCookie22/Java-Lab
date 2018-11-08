@@ -44,6 +44,7 @@ public class Kolumna {
     }
 
     public void dodaj (Value element)throws  IllegalArgumentException{
+        Class<? extends Value> tmpTyp = element.getClass();
         if(typ.isInstance(element)){
             this.dane.add(element);}
             else {throw new IllegalArgumentException();}

@@ -194,7 +194,7 @@ public class SparseDataFrame extends DataFrame {
 
     //--------------Konstruktory SparseDataFrame------------------------------------
 
-    public SparseDataFrame(){};
+//    public SparseDataFrame(){};
 
     public SparseDataFrame(String[] lista_nazw,  Class<? extends Value>[] lista_typow, Value []hide) {
         super(lista_nazw, lista_typow);

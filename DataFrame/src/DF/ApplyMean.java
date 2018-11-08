@@ -24,8 +24,17 @@ public class ApplyMean implements Applyable  {
                 colnames.add(df_names[i]);
             }
         }
+    Class<DoubleValue>[] double_types= new Class[types.size()];
 
-        DataFrame output = new DataFrame(colnames.toArray(new String[0]),types.toArray(new Class[0]));
+        for (int i=0;i<double_types.length;i++){
+            double_types[i]= DoubleValue.class;
+        }
+
+        if(colnames.size()==0 || types.size()==0){
+            throw new IllegalArgumentException("pusta DF");
+        }
+
+        DataFrame output = new DataFrame(colnames.toArray(new String[0]),double_types);
 
         int size = output.iloscKolumn();
         Value[] srednie = new Value[size];
@@ -38,7 +47,7 @@ public class ApplyMean implements Applyable  {
                     for (int j = 1 ;j < kol.size(); j++) {
                         suma = suma.add(kol.zwrocObiekt(j));
                     }
-                    srednie[i] = suma.div(new DoubleValue(kol.size()));
+                    srednie[i] = new DoubleValue(((NumericValue)suma).getValue().doubleValue()).div(new DoubleValue(df.ilosc_wierszy));
             }
             output.dodajElement(srednie);
         }

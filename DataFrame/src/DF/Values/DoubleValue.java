@@ -1,6 +1,6 @@
 package DF.Values;
 
-public class DoubleValue extends NumericValue {
+public class DoubleValue extends NumericValue implements Comparable<DoubleValue> {
     private double value;
 
     public DoubleValue(double value){
@@ -135,4 +135,9 @@ public class DoubleValue extends NumericValue {
     public DoubleValue create(String s){
         return new DoubleValue(Double.parseDouble(s));
     }
+
+    @Override
+    public int compareTo(DoubleValue obj) {
+        return Double.compare(value,obj.value);
+   }
 }

@@ -22,11 +22,8 @@ public class StringValue  extends Value implements Comparable<StringValue>{
 //    }
 
     @Override
-    public StringValue add(Value value){
-        if ( value instanceof  StringValue){
-            return new StringValue(this.value+((StringValue)value).value);
-        }
-        else{throw new UnsupportedOperationException();}
+    public StringValue add(Value val)throws UnsupportedOperationException{
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -76,7 +73,7 @@ public class StringValue  extends Value implements Comparable<StringValue>{
     @Override
     public boolean lte(Value val) {// sprawdzany porządek alfabetyczny czy this.value jest wczesniej niz val
         if(val instanceof StringValue){
-            if((this.value.compareTo(((StringValue)val).value))>=0){
+            if((this.value.compareTo(((StringValue)val).value))<=0){
                 return true;
             } else{return false;}
         }
@@ -85,7 +82,7 @@ public class StringValue  extends Value implements Comparable<StringValue>{
     @Override
     public boolean gte(Value val) {// sprawdzany porządek alfabetyczny czy this.value jest później niz val
         if(val instanceof StringValue){
-            if((this.value.compareTo(((StringValue)val).value))<=0){
+            if((this.value.compareTo(((StringValue)val).value))>=0){
                 return true;
             } else{return false;}
         }

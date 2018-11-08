@@ -1,6 +1,6 @@
 package DF.Values;
 
-public class IntegerValue extends NumericValue {
+public class IntegerValue extends NumericValue implements Comparable<IntegerValue> {
     private int value;
 
 
@@ -160,6 +160,11 @@ public class IntegerValue extends NumericValue {
     @Override
     public IntegerValue create(String s){
         return new IntegerValue(Integer.parseInt(s));
+    }
+
+    @Override
+    public int compareTo(IntegerValue obj){
+        return Integer.compare(value,obj.value);
     }
 
 }

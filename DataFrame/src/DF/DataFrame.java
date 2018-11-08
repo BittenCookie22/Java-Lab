@@ -16,12 +16,15 @@ public class DataFrame {
 
 //-----------------Konstruktory DataFrame ------------------------------
 
-    public DataFrame() {
-    }
+//    public DataFrame() {
+//    }
 
     ;
 
     public void konstruktorZwyczajny(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
+        if (lista_nazw.length == 0 || lista_typow.length==0) {
+            throw  new RuntimeException("fuck this shit");
+        }
         kolumny = new Kolumna[lista_typow.length];
         for (int i = 0; i < lista_typow.length; i++) {
             kolumny[i] = new Kolumna(lista_nazw[i], lista_typow[i]);
@@ -35,19 +38,12 @@ public class DataFrame {
             kolumny[i] = new Kolumna(nazwyKolumn[i], typyKolumn[i]);
     }
 
-//    public DataFrame(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
-//        Value[] typy = new Value[lista_typow.length];
-//        this.lista_nazw=lista_nazw;
-//        for (int i = 0; i < lista_typow.length; i++) {
-//            typy[i] = Value.zwrocTypDanej(lista_typow[i]);
-//        }
-//        this.lista_typow=typy;
-//        konstruktorZwyczajny(lista_nazw, typy);
-//
-//    }
 
 
     public DataFrame(Kolumna[] kolumny) {
+        if (kolumny.length == 0) {
+            throw  new RuntimeException("pusty DF");
+        }
         this.kolumny = kolumny;
         ilosc_wierszy = kolumny[0].size(); // liczba danych w dowolnej kolumnie, z zał mają mieć taką samą długość
         for (Kolumna i : kolumny) {
@@ -67,6 +63,9 @@ public class DataFrame {
     }
 
     protected DataFrame(int ilosc_kolumn) {
+        if(ilosc_kolumn ==0) {
+                throw  new RuntimeException("fuck this shit");
+            }
         this.kolumny = new Kolumna[ilosc_kolumn];
         this.ilosc_wierszy = 0;
         lista_nazw = new String[ilosc_kolumn];
@@ -253,7 +252,7 @@ public class DataFrame {
     public void addRecord(Value... values) {
         if (values.length != kolumny.length) throw new ArrayIndexOutOfBoundsException();
         for (int i = 0; i < kolumny.length; i++)
-            if (!kolumny[i].typ.isInstance(values[i])) throw new IndexOutOfBoundsException();
+            if (!kolumny[i].typ.isInstance(values[i])) throw new IllegalArgumentException();
 
         int i = 0;
         ilosc_wierszy++;
