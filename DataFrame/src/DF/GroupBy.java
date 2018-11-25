@@ -1,13 +1,16 @@
 package DF;
 
-public interface GroupBy {
+import DF.Exceptions.IncoherentTypeException;
+import DF.Exceptions.ZeroLengthException;
 
-    default DataFrame max() { return apply(new ApplyMax());}
-    default DataFrame min() { return apply(new ApplyMin());}
-    default DataFrame mean() { return apply(new ApplyMean());}
-    default DataFrame std() { return apply(new ApplyStd());}
-    default DataFrame sum() { return apply(new ApplySum());}
-    default DataFrame var() { return apply(new ApplyVar());}
+public interface GroupBy  {
 
-    DataFrame apply(Applyable funkcja);
+    default DataFrame max() throws IncoherentTypeException, ZeroLengthException { return apply(new ApplyMax());}
+    default DataFrame min() throws IncoherentTypeException, ZeroLengthException { return apply(new ApplyMin());}
+    default DataFrame mean() throws IncoherentTypeException, ZeroLengthException { return apply(new ApplyMean());}
+    default DataFrame std() throws IncoherentTypeException, ZeroLengthException { return apply(new ApplyStd());}
+    default DataFrame sum() throws IncoherentTypeException, ZeroLengthException { return apply(new ApplySum());}
+    default DataFrame var() throws IncoherentTypeException, ZeroLengthException { return apply(new ApplyVar());}
+
+    DataFrame apply(Applyable funkcja) throws IncoherentTypeException, ZeroLengthException;
 }

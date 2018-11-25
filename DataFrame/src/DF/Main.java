@@ -1,9 +1,16 @@
 package DF;
 
+import DF.Exceptions.IncoherentTypeException;
+import DF.Exceptions.NoSenseInGroupingByAllColumnsException;
+import DF.Exceptions.ValueParseException;
+import DF.Exceptions.ZeroLengthException;
+import DF.Values.IntegerValue;
+import DF.Values.StringValue;
+
 import java.io.IOException;
 
 public class Main {
-    public static void main (String[] args) throws IOException {
+    public static void main (String[] args) throws IOException, ValueParseException, ZeroLengthException, NoSenseInGroupingByAllColumnsException {
 //        DataFrame tmp = new DataFrame(new String[]{"z","g","r"}, new Class[] {IntegerValue.class,IntegerValue.class,IntegerValue.class} );
 //        tmp.addRecord(new IntegerValue(9),new IntegerValue(23),new IntegerValue(33));
 //        tmp.addRecord(new IntegerValue(11),new IntegerValue(44),new IntegerValue(55));
@@ -13,15 +20,23 @@ public class Main {
 //        System.out.println(tmp.toString());
 
 
-//         TEST DLA JEDNEGO KLUCZA
-//        DataFrame tmp2 = new DataFrame("groupby.csv", new Class[]{StringValue.class, DateTimeValue.class, DoubleValue.class, DoubleValue.class});
-//        DataFrame tmp4 = new DataFrame("tg.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
+       //  TEST DLA JEDNEGO KLUCZA
+        try {
+            DataFrame tmp2 = new DataFrame("C:\\Users\\Joanna\\Desktop\\test.csv", new Class[]{ StringValue.class, IntegerValue.class, IntegerValue.class});
+           // System.out.println(tmp2.toString());
+            DataFrame.Grupator group = tmp2.groupBy(new String[]{"id"});
+            System.out.println(group.std());
+        } catch (IncoherentTypeException e) {
+            e.printStackTrace();
+        }
+
+//      //  DataFrame tmp4 = new DataFrame("tg.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
 //
-//        System.out.println(tmp2.toString());
+//       // System.out.println(tmp2.toString());
 //
 //
-//        DataFrame.Grupator group = tmp2.groupBy(new String[]{"id"});
-//        System.out.println(group.sum());
+      //  DataFrame.Grupator group = tmp2.groupBy(new String[]{"id"});
+//       System.out.println(group.sum());
 //        System.out.println(group.max());
 //         System.out.println(group.min());
 //         System.out.println(group.mean());
@@ -43,16 +58,16 @@ public class Main {
 
 
 
-//        DataFrame my = new DataFrame(new String[]{"double","double2","double3"},new Class[]{DoubleValue.class,DoubleValue.class,DoubleValue.class});
+//       DataFrame my = new DataFrame(new String[]{"double","double2","double3"},new Class[]{DoubleValue.class,DoubleValue.class,DoubleValue.class});
 //        my.addRecord(new DoubleValue(9.0),new DoubleValue(6.7),new DoubleValue(6.7));
 //        my.addRecord(new DoubleValue(10.0),new DoubleValue(45.7),new DoubleValue(6.7));
 //        my.addRecord(new DoubleValue(11.0),new DoubleValue(6.0),new DoubleValue(8.0));
 //        my.addRecord(new DoubleValue(11.0),new DoubleValue(5.0),new DoubleValue(7.0));
-//
-//       // System.out.println(my.toString());
-//
-//        DataFrame.Grupator grupkaTest = my.groupBy(new String[]{"double"});
-//        System.out.println(grupkaTest.std());
+////
+////System.out.println(my.toString());
+//////
+//       DataFrame.Grupator grupkaTest = my.groupBy(new String[]{"double"});
+//       System.out.println(grupkaTest.max());
 
 //        DataFrame my1 = new DataFrame(new String[]{"float","float2","float3"},new Class[]{FloatValue.class,FloatValue.class,FloatValue.class});
 //        my1.addRecord(new FloatValue(9.0f),new FloatValue(67.0f),new FloatValue(67.0f));
@@ -103,8 +118,65 @@ public class Main {
 //
 //        DataFrame.Grupator grupkaTest = my.groupBy(new String[]{"integer"});
 //        System.out.println(grupkaTest.std());
+
+
+
 ////
+
+//        Kolumna test1 = new Kolumna ("nazwa",StringValue.class);
+//
+//
+//        try {
+//            test1.dodaj(new StringValue("1"));
+//            test1.dodaj(new StringValue("2"));
+//            test1.dodaj(new StringValue("3"));
+//            test1.dodaj(new StringValue("4"));
+//        } catch (IncoherentTypeException e) {
+//            System.out.println("problemik");
+//        }
+//
+//
+////        Kolumna test2 = new Kolumna ("nazwaa",IntegerValue.class);
+////
+////        test2.dodaj(new IntegerValue(1));
+////        test2.dodaj(new IntegerValue(2));
+////        test2.dodaj(new IntegerValue(3));
+////        test2.dodaj(new IntegerValue(4));
+////
+//////
+////       // Kolumna test11= test1.doMathByUser(new StringValue("s"));
+////
+////       Kolumna testA = test1.addKol(test2);
+//     //   System.out.println(testA.toString());
+//       // Kolumna test11= test1.sub(new IntegerValue(10));
+//        //Kolumna test11= test1.mul(new IntegerValue(10));
+//        //Kolumna test11= test1.div(new IntegerValue(10));
+//       // Kolumna test11= test1.pow(new IntegerValue(3));
+//
+//        //System.out.println(test11.toString());
+//        Kolumna test2 = new Kolumna ("id",FloatValue.class);
+//
+//        try {
+//            test2.dodaj(new FloatValue(1.0f));
+//            test2.dodaj(new FloatValue(2.0f));
+//            test2.dodaj(new FloatValue(3.0f));
+//            test2.dodaj(new FloatValue(4.0f));
+//        } catch (IncoherentTypeException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//        Kolumna output = null;
+//        try {
+//            output = test1.powKol(test2);
+//        } catch (IncoherentTypeException | DifferentSizeOfColumnsExcepiton e) {
+//            System.out.println("problemik");
+//        }
+//        System.out.println(output.toString());
+
     }
+
+
 
 
 

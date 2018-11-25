@@ -1,5 +1,7 @@
 package DF;
 
+import DF.Exceptions.DifferentAmountOfColumns;
+import DF.Exceptions.IncoherentTypeException;
 import DF.Values.NumericValue;
 import DF.Values.Value;
 
@@ -37,6 +39,7 @@ public class ApplySum implements Applyable  {
         Value[] sum = new Value[output.iloscKolumn()];
 
         if (size > 0) {
+            try{
             String[] lista_nazw = output.zwroc_nazwy();
             for (int i = 0; i < output.iloscKolumn(); i++) {
                 Kolumna kol = df.get(lista_nazw[i]);
@@ -50,7 +53,10 @@ public class ApplySum implements Applyable  {
                     }
                     sum[i]=suma;
             }
-            output.addRecord(sum);
+            output.dodajElement(sum);}
+            catch (IncoherentTypeException | DifferentAmountOfColumns e){
+                e.printStackTrace();
+            }
         }
         return output;
     }

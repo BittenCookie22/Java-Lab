@@ -1,5 +1,8 @@
 package DF;
 
+import DF.Exceptions.DifferentAmountOfColumns;
+import DF.Exceptions.IncoherentTypeException;
+import DF.Exceptions.ZeroLengthException;
 import DF.Values.DoubleValue;
 import DF.Values.Value;
 
@@ -7,7 +10,7 @@ public class ApplyStd  implements Applyable{
 
 
         @Override
-        public DataFrame apply(DataFrame df){
+        public DataFrame apply(DataFrame df) throws IncoherentTypeException, ZeroLengthException {
 
 
             Applyable a = new ApplyVar();
@@ -21,12 +24,15 @@ public class ApplyStd  implements Applyable{
             int size = var.size();
 
             if(size>0){
-
+                try{
                 for (int i=0; i<var.iloscKolumn();i++){
                     std[i] = wariancja[i].pow(new DoubleValue(0.5));
 
                 }
-                output.dodajElement(std);
+                output.dodajElement(std);}
+                catch (IncoherentTypeException|DifferentAmountOfColumns e){
+                    e.printStackTrace();
+                }
 
             }
             return output;

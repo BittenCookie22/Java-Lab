@@ -1,5 +1,7 @@
 package DF;
 
+import DF.Exceptions.DifferentAmountOfColumns;
+import DF.Exceptions.IncoherentTypeException;
 import DF.Values.DoubleValue;
 import DF.Values.NumericValue;
 import DF.Values.Value;
@@ -40,16 +42,21 @@ public class ApplyMean implements Applyable  {
         Value[] srednie = new Value[size];
 
         if (size>0) {
-            for (int i = 0; i < size; i++) {
-                String[] lista_nazw = output.zwroc_nazwy();
-                Kolumna kol = df.get(lista_nazw[i]);
+            try {
+                for (int i = 0; i < size; i++) {
+                    String[] lista_nazw = output.zwroc_nazwy();
+                    Kolumna kol = df.get(lista_nazw[i]);
                     Value suma = kol.zwrocObiekt(0);
-                    for (int j = 1 ;j < kol.size(); j++) {
+                    for (int j = 1; j < kol.size(); j++) {
                         suma = suma.add(kol.zwrocObiekt(j));
                     }
-                    srednie[i] = new DoubleValue(((NumericValue)suma).getValue().doubleValue()).div(new DoubleValue(df.ilosc_wierszy));
+                    srednie[i] = new DoubleValue(((NumericValue) suma).getValue().doubleValue()).div(new DoubleValue(df.ilosc_wierszy));
+                }
+                output.dodajElement(srednie);
             }
-            output.dodajElement(srednie);
+            catch (IncoherentTypeException | DifferentAmountOfColumns e){
+                e.printStackTrace();
+            }
         }
 
         return output;

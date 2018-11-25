@@ -1,5 +1,7 @@
 package DF.Values;
 
+import DF.Exceptions.IncoherentTypeException;
+
 public class IntegerValue extends NumericValue implements Comparable<IntegerValue> {
     private int value;
 
@@ -81,12 +83,16 @@ public class IntegerValue extends NumericValue implements Comparable<IntegerValu
         }
     }
     @Override
-    public  IntegerValue div(Value val){
-        if(val instanceof NumericValue ){
-                    return new IntegerValue(this.value/((NumericValue)val).getValue().intValue());}
+    public  IntegerValue div(Value val) throws IncoherentTypeException {
+        if(val instanceof NumericValue ) {
+            if (((NumericValue) val).getValue().intValue() != 0) {
+                return new IntegerValue(this.value / ((NumericValue) val).getValue().intValue());
+            }
+            else {throw new ArithmeticException("divide by 0"); }
 
+        }
         else{
-            throw new UnsupportedOperationException();
+            throw new IncoherentTypeException("napisz cos mądrego");
         }
     }
 
@@ -96,12 +102,11 @@ public class IntegerValue extends NumericValue implements Comparable<IntegerValu
      * @return IntegerValue this podniesione do potegi ktora jest reprezentowana jako Double w celu zachowania jak najwiekszej dokladnosci
      */
     @Override
-    public  IntegerValue pow(Value val){
-        IntegerValue tmp = new IntegerValue(0);
+    public  IntegerValue pow(Value val) throws IncoherentTypeException {
         if (val instanceof NumericValue){
-            tmp= new IntegerValue ((int)(Math.pow(this.value,((NumericValue)val).getValue().doubleValue())));
+            return new IntegerValue ((int)(Math.pow(this.value,((NumericValue)val).getValue().doubleValue())));
         }
-        return tmp;
+        throw new IncoherentTypeException("napisz cos madrego pozniej");
     }
 
     @Override

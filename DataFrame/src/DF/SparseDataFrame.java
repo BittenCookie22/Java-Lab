@@ -1,5 +1,8 @@
 package DF;
 
+import DF.Exceptions.DifferentAmountOfColumns;
+import DF.Exceptions.IncoherentTypeException;
+import DF.Exceptions.ValueParseException;
 import DF.Values.Value;
 
 import java.io.IOException;
@@ -86,7 +89,7 @@ public class SparseDataFrame extends DataFrame {
         throw new UnsupportedOperationException();
     }
     @Override
-    public boolean lte(Value val)throws UnsupportedOperationException{ //this jest mniejsza od val jesli jej warotsc jest mniejsza
+    public boolean lte(Value val) throws UnsupportedOperationException, IncoherentTypeException { //this jest mniejsza od val jesli jej warotsc jest mniejsza
         if(val instanceof COOValue){
 
             return wartosc.lte(((COOValue) val).wartosc);
@@ -96,7 +99,7 @@ public class SparseDataFrame extends DataFrame {
 
 
     @Override
-    public boolean gte(Value val)throws UnsupportedOperationException{
+    public boolean gte(Value val) throws UnsupportedOperationException, IncoherentTypeException {
         if(val instanceof COOValue){
             if(isNumeric.isThisValueNumeric(this.wartosc) & isNumeric.isThisValueNumeric(val)){
                 if(this.wartosc.gte(val)){return true;}
@@ -111,7 +114,11 @@ public class SparseDataFrame extends DataFrame {
         if (other==null){return false;}
         if (other instanceof COOValue){
             COOValue otherCOO = (COOValue) other;
-            if(this.wartosc.eq(((COOValue) other).wartosc) & this.indeks == ((COOValue) other).indeks){return true;}
+            try {
+                if(this.wartosc.eq(((COOValue) other).wartosc) & this.indeks == ((COOValue) other).indeks){return true;}
+            } catch (IncoherentTypeException e) {
+                e.printStackTrace();
+            }
 
         }
         return false;
@@ -217,21 +224,27 @@ public class SparseDataFrame extends DataFrame {
             }
 
         Value [] tablica_typow = new Value[kolumny.length];
+        try {
             for (int i=0;i<DF.ilosc_wierszy;i++){
                 int tmp=0;
                 for (Kolumna kol:DF.kolumny){
                     tablica_typow[tmp++]=kol.zwrocObiekt(i);
                 }
-                dodajElement(tablica_typow);
+
+                    dodajElement(tablica_typow);
+
 
             }
+        } catch (IncoherentTypeException|DifferentAmountOfColumns e) {
+            e.printStackTrace();
+        }
     }
 
 
 
 //--------------------ToDense - zwraca DataFrame (konwertuje SparseDataFrame do DataFrame)------------------------------------------------------------
 
-    public DataFrame toDense(SparseDataFrame SPD){
+    public DataFrame toDense(SparseDataFrame SPD) {
         String []nazwy = new String[SPD.kolumny.length];
         Class<? extends Value> [] typy = new  Class[SPD.kolumny.length];
 
@@ -239,10 +252,15 @@ public class SparseDataFrame extends DataFrame {
         typy = SPD.zwroc_typy();
 
         DataFrame df =  new DataFrame(nazwy,typy);
-
+        try {
         for(int i=0;i<size();i++)
         {
-            df.dodajElement(zwrocWiersz(i));
+
+                df.dodajElement(zwrocWiersz(i));
+
+        }
+        } catch (DifferentAmountOfColumns|IncoherentTypeException e) {
+            e.printStackTrace();
         }
         return df;
     }
@@ -282,7 +300,7 @@ public class SparseDataFrame extends DataFrame {
     }
 
     @Override
-    public SparseDataFrame iloc(int from, int to) {
+    public SparseDataFrame iloc(int from, int to)  {
         if (from<0 || from >= ilosc_wierszy){
             throw new IndexOutOfBoundsException("Nie ma wiersza o numerze" + from);
         }
@@ -305,20 +323,26 @@ public class SparseDataFrame extends DataFrame {
         }
 
         SparseDataFrame df=new SparseDataFrame(nazwy,typy,hide);
+        try {
         for(int i=from;i<=to;i++){
-            df.dodajElement(zwrocWiersz(i));
+
+                df.dodajElement(zwrocWiersz(i));
+
+        }
+        } catch (DifferentAmountOfColumns| IncoherentTypeException e) {
+            e.printStackTrace();
         }
 
         return df;
     }
 
     //---czyteanie z pliku KONSTRUKTORY---------
-    public SparseDataFrame(String path, Class<? extends Value>[] typy_kolumn,Value[] hide) throws IOException {
+    public SparseDataFrame(String path, Class<? extends Value>[] typy_kolumn,Value[] hide) throws IOException, IncoherentTypeException, ValueParseException {
         this(path,typy_kolumn,null,hide); //nazwy kolumn są zawarte w 1szej linii pliku
 
     }
 
-    public SparseDataFrame(String path, Class<? extends Value>[] typy_kolumn, String[]nazwy_kolumn,Value[]hide) throws IOException { // header==false
+    public SparseDataFrame(String path, Class<? extends Value>[] typy_kolumn, String[]nazwy_kolumn,Value[]hide) throws IOException, IncoherentTypeException, ValueParseException { // header==false
         super(typy_kolumn.length);
         boolean header = nazwy_kolumn==null;
         for(int i=0;i<typy_kolumn.length;i++)

@@ -1,5 +1,7 @@
 package DF;
 
+import DF.Exceptions.DifferentAmountOfColumns;
+import DF.Exceptions.IncoherentTypeException;
 import DF.Values.Value;
 
 import java.util.HashSet;
@@ -15,23 +17,31 @@ public class ApplyMin implements Applyable {
         int size = df.size();
 
         if (size > 0) {
-            Value[] min = df.zwrocWiersz(0);
-            for (int i = 1; i < size; i++) {
-                Value[] row = df.zwrocWiersz(i);
-                for (int kolumna = 0; kolumna < row.length; kolumna++) {
+            try {
+                Value[] min = df.zwrocWiersz(0);
+                for (int i = 1; i < size; i++) {
+                    Value[] row = df.zwrocWiersz(i);
+                    for (int kolumna = 0; kolumna < row.length; kolumna++) {
 
 
-                    if (bannedColumn.contains(kolumna)) {continue;}
-
-                    try {
-                        if (min[kolumna].gte(row[kolumna])) {
-                            min[kolumna] = row[kolumna];
+                        if (bannedColumn.contains(kolumna)) {
+                            continue;
                         }
 
-                    } catch (UnsupportedOperationException ignored) { bannedColumn.add(kolumna); }
+                        try {
+                            if (min[kolumna].gte(row[kolumna])) {
+                                min[kolumna] = row[kolumna];
+                            }
+
+                        } catch (UnsupportedOperationException ignored) {
+                            bannedColumn.add(kolumna);
+                        }
+                    }
                 }
+                output.dodajElement(min);
+            } catch (IncoherentTypeException | DifferentAmountOfColumns e) {
+                e.printStackTrace();
             }
-            output.dodajElement(min);
         }
 
         if (bannedColumn.size() == output.iloscKolumn()) {

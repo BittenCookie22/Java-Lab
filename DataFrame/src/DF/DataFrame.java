@@ -1,15 +1,18 @@
 package DF;
 
+import DF.Exceptions.*;
 import DF.Values.Value;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.TreeMap;
 
 public class DataFrame {
-    Kolumna[] kolumny;
+     Kolumna[] kolumny;
     int ilosc_wierszy;
     public String[] lista_nazw;
     Class<? extends Value>[] lista_typow;
@@ -22,8 +25,8 @@ public class DataFrame {
     ;
 
     public void konstruktorZwyczajny(String[] lista_nazw, Class<? extends Value>[] lista_typow) {
-        if (lista_nazw.length == 0 || lista_typow.length==0) {
-            throw  new RuntimeException("fuck this shit");
+        if (lista_nazw.length == 0 || lista_typow.length == 0) {
+            throw new RuntimeException("ten DF jest pusty");
         }
         kolumny = new Kolumna[lista_typow.length];
         for (int i = 0; i < lista_typow.length; i++) {
@@ -39,10 +42,9 @@ public class DataFrame {
     }
 
 
-
     public DataFrame(Kolumna[] kolumny) {
         if (kolumny.length == 0) {
-            throw  new RuntimeException("pusty DF");
+            throw new RuntimeException("pusty DF");
         }
         this.kolumny = kolumny;
         ilosc_wierszy = kolumny[0].size(); // liczba danych w dowolnej kolumnie, z zał mają mieć taką samą długość
@@ -63,9 +65,9 @@ public class DataFrame {
     }
 
     protected DataFrame(int ilosc_kolumn) {
-        if(ilosc_kolumn ==0) {
-                throw  new RuntimeException("fuck this shit");
-            }
+        if (ilosc_kolumn == 0) {
+            throw new RuntimeException("ten DF jest pusty");
+        }
         this.kolumny = new Kolumna[ilosc_kolumn];
         this.ilosc_wierszy = 0;
         lista_nazw = new String[ilosc_kolumn];
@@ -73,12 +75,11 @@ public class DataFrame {
     }
 
 
-
 // -----------------------dodajElement gdzie element to cały wiersz z danymi--------------------
 
-    public void dodajElement(Value[] elementy) {
+    public void dodajElement(Value... elementy) throws DifferentAmountOfColumns, IncoherentTypeException {
         if (elementy.length != kolumny.length) {
-            throw new RuntimeException("blad");
+            throw new DifferentAmountOfColumns(this.kolumny.length, elementy.length);
         }
         int i = 0;
         ilosc_wierszy++;
@@ -88,6 +89,10 @@ public class DataFrame {
     }
 
     //------------ zwrocWiersz - zwraca wiersz o indeksie i ------- + gettery-----------------------
+    public int iloscKolumn() {
+        return kolumny.length;
+    }
+
     public Value[] zwrocWiersz(int i) {
         Value[] wiersz = new Value[kolumny.length];
         int j = 0;
@@ -97,25 +102,43 @@ public class DataFrame {
         return wiersz;
     }
 
-    public Class<? extends Value>[] zwroc_typy(){
-        Class<? extends Value>[]tablica_typow =  ( Class<? extends Value>[])(new Class[kolumny.length]);
+    public Class<? extends Value>[] zwroc_typy() {
+        Class<? extends Value>[] tablica_typow = (Class<? extends Value>[]) (new Class[kolumny.length]);
 
-        for (int i =0;i<this.kolumny.length;i++){
-            tablica_typow[i]=kolumny[i].typ;
+        for (int i = 0; i < this.kolumny.length; i++) {
+            tablica_typow[i] = kolumny[i].typ;
         }
         return tablica_typow;
     }
 
-    public String [] zwroc_nazwy(){
-        String[]tablica_nazw =  new String[kolumny.length];
+    public String[] zwroc_nazwy() {
+        String[] tablica_nazw = new String[kolumny.length];
 
-        for (int i =0;i<this.kolumny.length;i++){
-            tablica_nazw[i]=kolumny[i].nazwa;
+        for (int i = 0; i < this.kolumny.length; i++) {
+            tablica_nazw[i] = kolumny[i].nazwa;
         }
         return tablica_nazw;
     }
 
     // -------------------funkcje zadane w lab1-------------------------
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        String[] str;
+        for (Kolumna k : kolumny) {
+            str = k.typ.getTypeName().split("\\.");
+            s.append("|").append(k.nazwa).append(":").append(str[str.length - 1]);
+        }
+        s.append("|\n");
+        for (int i = 0; i < ilosc_wierszy; i++) {
+            for (Kolumna k : kolumny)
+                s.append("|").append(k.zwrocObiekt(i).toString());
+            s.append("|\n");
+        }
+        return s.toString();
+    }
+
     public int size() {
         return ilosc_wierszy;
     }
@@ -154,14 +177,17 @@ public class DataFrame {
         DataFrame nowa_DF = new DataFrame(nazwy, typy); //nowa DF
         Value[] nowe_wiersze = new Value[kolumny.length];
 
+        try {
+            for (int i = from; i <= to; i++) {
+                for (int j = 0; j < kolumny.length; j++) {   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
+                    nowe_wiersze[j] = this.kolumny[j].dane.get(i);
+                }
 
-        for (int i = from; i <= to; i++) {
-            for (int j = 0; j < kolumny.length; j++) {   // wypełnienie nowych_wierszy danymi na podstawie wierszy ze starej DF
-                nowe_wiersze[j] = this.kolumny[j].dane.get(i);
+                nowa_DF.dodajElement(nowe_wiersze);
             }
-            nowa_DF.dodajElement(nowe_wiersze);
+        } catch (DifferentAmountOfColumns | IncoherentTypeException e) {
+            e.printStackTrace();
         }
-
         return nowa_DF;
     }
 
@@ -188,58 +214,55 @@ public class DataFrame {
 
 //---------------czytanie z pliku-----------------------
 
-    public void readingFromFileFunction(String path, boolean header) throws IOException {
-        // Open the file
-        FileInputStream fstream = new FileInputStream(path);
-        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+    public void readingFromFileFunction(String path, boolean header) throws IOException, IncoherentTypeException, ValueParseException {
 
-        String[] strLine;
+        try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+            // Open the file
+
+            String[] strLine;
 
 
-        if (header) // to znaczy że pierwsza linia pliku ma w sobie nazwy kolumn
-        {
-            strLine = br.readLine().split(",");
-            for (int i = 0; i < kolumny.length; i++) {
-                kolumny[i].nazwa = strLine[i];
+            if (header) // to znaczy że pierwsza linia pliku ma w sobie nazwy kolumn
+            {
+                strLine = br.readLine().split(",");
+                for (int i = 0; i < kolumny.length; i++) {
+                    kolumny[i].nazwa = strLine[i];
+                }
             }
-        }
-        String tmp;
-        Value[] wartosciZpliku = new Value[kolumny.length];
-        while (((tmp = br.readLine()) != null)) {
-            strLine = tmp.split(",");
-            int m = 0;
-            for (String wartoscWpostaciStringa : strLine) {
-                //TmpTypDanych tmpTyp =
-                try {
-                    wartosciZpliku[m] = (kolumny[m].typ).newInstance().create(wartoscWpostaciStringa);
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+            String tmp;
+            Value[] wartosciZpliku = new Value[kolumny.length];
+            while (((tmp = br.readLine()) != null)) {
+                strLine = tmp.split(",");
+                int m = 0;
+                for (String wartoscWpostaciStringa : strLine) {
+                    //TmpTypDanych tmpTyp =
+                    try {
+                        wartosciZpliku[m] = (kolumny[m].typ).newInstance().create(wartoscWpostaciStringa);
+                    } catch (Exception e) {
+                        throw new ValueParseException(size(),kolumny[m].getNazwa());
+                    }
+
+
+                    //wartoscWpostaciStringa); //konwersja do konkretnego typu danych
+                    m++;
                 }
 
-
-                //wartoscWpostaciStringa); //konwersja do konkretnego typu danych
-                m++;
+                dodajElement(wartosciZpliku);
             }
-            dodajElement(wartosciZpliku);
+        } catch (DifferentAmountOfColumns e) {
+            e.printStackTrace();
+        } catch (IncoherentTypeException e) {
+            throw new IncoherentTypeException(e.getRowNumber(), e.getColName(), "Blad przy czytaniu z pliku");
         }
 
-
-        // else{ // trzeba zczytać typy kolumn ręcznie
-
-        //}
-
-//Close the input stream
-        br.close();
     }
 
-    public DataFrame(String path, Class<? extends Value>[] typy_kolumn) throws IOException {
+    public DataFrame(String path, Class<? extends Value>[] typy_kolumn) throws IOException, IncoherentTypeException, ValueParseException {
         this(path, typy_kolumn, null); //nazwy kolumn są zawarte w 1szej linii pliku
 
     }
 
-    public DataFrame(String path, Class<? extends Value>[] typy_kolumn, String[] nazwy_kolumn) throws IOException { // header==false
+    public DataFrame(String path, Class<? extends Value>[] typy_kolumn, String[] nazwy_kolumn) throws IOException, IncoherentTypeException, ValueParseException { // header==false
         this(typy_kolumn.length);
         boolean header = nazwy_kolumn == null;
         for (int i = 0; i < typy_kolumn.length; i++)
@@ -249,182 +272,189 @@ public class DataFrame {
 
     }
 
-    public void addRecord(Value... values) {
-        if (values.length != kolumny.length) throw new ArrayIndexOutOfBoundsException();
-        for (int i = 0; i < kolumny.length; i++)
-            if (!kolumny[i].typ.isInstance(values[i])) throw new IllegalArgumentException();
 
-        int i = 0;
-        ilosc_wierszy++;
-        for (Kolumna k : kolumny)
-            k.dodaj(values[i++]);
-
-    }
+//    public void addRecord(Value... values) {
+//        if (values.length != kolumny.length) throw new DifferentAmountOfColumns(kolumny.length,values.length);
+//        for (int i = 0; i < kolumny.length; i++)
+//            if (!kolumny[i].typ.isInstance(values[i]))
+//                throw new IncoherentTypeException("klasa elementu dodawanego: " + values[i].getClass() + " niezgodna z typem w kolumnie " + "do ktorej mial byc dodany " + kolumny[i].typ + " - operacja dodania elementu " + values[i] + " niemozliwa");
+//
+//        int i = 0;
+//        ilosc_wierszy++;
+//        for (Kolumna k : kolumny) {
+//            try {
+//                k.dodaj(values[i++]);
+//            } catch (IncoherentTypeException e) {
+//                throw new IncoherentTypeException(ilosc_wierszy, k.nazwa);
+//            }
+//        }
+//
+//    }
 
     /// -----------group by -----------
 
-    public TreeMap<Value, DataFrame> groupBy(String colname){
-        Kolumna kol  =get(colname);
+    public TreeMap<Value, DataFrame> groupBy(String colname) {
+        Kolumna kol = get(colname);
         TreeMap<Value, DataFrame> output = new TreeMap<>();
+        try {
+            for (int i = 0; i < ilosc_wierszy; i++) {
+                Value key = kol.zwrocObiekt(i);
+                //   System.out.println(key);
+                Value[] row = zwrocWiersz(i);
+                DataFrame ll = output.get(key);
 
-        for (int i = 0; i < ilosc_wierszy; i++) {
-            Value key=kol.zwrocObiekt(i);
-            Value[] row = zwrocWiersz(i);
-            DataFrame ll = output.get(key);
+                if (ll != null) {
 
-            if(ll!= null)
-                ll.addRecord(row);
+                    ll.dodajElement(row);
 
-            else{
-                ll  =new SparseDataFrame(zwroc_nazwy(),zwroc_typy(),row);
-                ll.addRecord(row);
-                output.put(key,ll);
+                } else {
+                    ll = new SparseDataFrame(zwroc_nazwy(), zwroc_typy(), row);
+                    ll.dodajElement(row);
+                    output.put(key, ll);
+                }
             }
+        } catch (DifferentAmountOfColumns | IncoherentTypeException e) {
+            e.printStackTrace();
         }
 
         return output;
     }
 
-    public Grupator groupBy(String[] colname){
-        TreeMap<Value,DataFrame> initial =  groupBy(colname[0]);
+    public Grupator groupBy(String[] colname) throws ZeroLengthException, NoSenseInGroupingByAllColumnsException {
+        if(colname.length==this.kolumny.length){throw new NoSenseInGroupingByAllColumnsException();
+        }
+        TreeMap<Value, DataFrame> initial = groupBy(colname[0]);
 
         LinkedList<DataFrame> lista;
 
-        if(colname.length ==1)
-            lista = new LinkedList<>(initial.values());
-        else
-            lista= new LinkedList<>();
+        if (colname.length == 1) lista = new LinkedList<>(initial.values());
+        else lista = new LinkedList<>();
 
-        LinkedList<DataFrame> temp= new LinkedList<>(initial.values());
+        LinkedList<DataFrame> temp = new LinkedList<>(initial.values());
 
         for (int i = 1; i < colname.length; i++) {
             lista.clear();
-            for(DataFrame df:temp)
+            for (DataFrame df : temp)
                 lista.addAll(df.groupBy(colname[i]).values());
             temp.clear();
             temp.addAll(lista);
         }
 
-        return new Grupator(lista,colname);
+        return new Grupator(lista, colname);
 
     }
 
 
+    public class  Grupator implements GroupBy {
+        private LinkedList<DataFrame> lista;
+        private String[] kluczowe_nazwy_kolumn;
+        private Kolumna[] kluczowe_kolumny;
+        private String[] nazwy_kolumn_z_wartosciami;
 
 
-    class Grupator implements GroupBy{
-        private LinkedList <DataFrame> lista;
-        private String[]  kluczowe_nazwy_kolumn;
-       private Kolumna[] kluczowe_kolumny;
-       private String[] nazwy_kolumn_z_wartosciami;
+        public Grupator(Collection<DataFrame> lista, String[] kluczowe_nazwy_kolumn) throws ZeroLengthException {
 
-
-        public Grupator (Collection<DataFrame> lista,String[]kluczowe_nazwy_kolumn){
-            this.lista= new LinkedList<>(lista);
-            this.kluczowe_nazwy_kolumn=kluczowe_nazwy_kolumn;
-            this.kluczowe_kolumny=new Kolumna[kluczowe_nazwy_kolumn.length];
+            this.lista = new LinkedList<>(lista);
+            this.kluczowe_nazwy_kolumn = kluczowe_nazwy_kolumn;
+            this.kluczowe_kolumny = new Kolumna[kluczowe_nazwy_kolumn.length];
             String[] allNames = this.lista.getFirst().zwroc_nazwy();
-            nazwy_kolumn_z_wartosciami= new String[allNames.length-kluczowe_nazwy_kolumn.length];
-
-            int k=0;
+            nazwy_kolumn_z_wartosciami = new String[allNames.length - kluczowe_nazwy_kolumn.length];
+            if (nazwy_kolumn_z_wartosciami.length == 0) {
+                throw new ZeroLengthException();
+            }
+            int k = 0;
             outer:
-            for (String colname : allNames){
-                for(String kluczowa_nazwa:kluczowe_nazwy_kolumn){
-                    if(kluczowa_nazwa.equals(colname)){
+            for (String colname : allNames) {
+                for (String kluczowa_nazwa : kluczowe_nazwy_kolumn) {
+                    if (kluczowa_nazwa.equals(colname)) {
                         continue outer;
                     }
                 }
 
-                nazwy_kolumn_z_wartosciami[k]=colname;
+                nazwy_kolumn_z_wartosciami[k] = colname;
                 k++;
             }
 
-            for (int i=0;i<kluczowe_nazwy_kolumn.length;i++){
+            for (int i = 0; i < kluczowe_nazwy_kolumn.length; i++) {
                 Kolumna tmp = this.lista.getFirst().get(kluczowe_nazwy_kolumn[i]);
-                kluczowe_kolumny[i]=new Kolumna(tmp.nazwa,tmp.typ);
+                kluczowe_kolumny[i] = new Kolumna(tmp.nazwa, tmp.typ);
             }
+            try {
+                for (DataFrame df : this.lista) {
+                    for (int j = 0; j < kluczowe_kolumny.length; j++) {
 
-            for (DataFrame df : this.lista) {
-                for (int j = 0; j < kluczowe_kolumny.length; j++) {
-                       this.kluczowe_kolumny[j].dodaj(df.get(kluczowe_nazwy_kolumn[j]).zwrocObiekt(0));
+                        this.kluczowe_kolumny[j].dodaj(df.get(kluczowe_nazwy_kolumn[j]).zwrocObiekt(0));
+                    }
                 }
+            } catch (IncoherentTypeException e) {
+                e.printStackTrace();
             }
         }
 
 
         @Override
-        public DataFrame apply (Applyable funkcja){
+        public DataFrame apply(Applyable funkcja) throws IncoherentTypeException, ZeroLengthException {
             DataFrame output = null;
             for (int grupa = 0; grupa < this.lista.size(); grupa++) {
                 DataFrame df = lista.get(grupa);
-                 DataFrame tmp = funkcja.apply(df.get(nazwy_kolumn_z_wartosciami,false));
+                DataFrame tmp = funkcja.apply(df.get(nazwy_kolumn_z_wartosciami, false));
 
 
-                     //inicjalizacja DF output tak żeby miał wszystkie nazwy klumn łacznie z kluczowymi i ich typy
-                     if(output==null){
-                         String []temp_names=tmp.zwroc_nazwy();
-                         String[] output_colnames= new String[temp_names.length+kluczowe_nazwy_kolumn.length];
+                //inicjalizacja DF output tak żeby miał wszystkie nazwy klumn łacznie z kluczowymi i ich typy
+                if (output == null) {
+                    String[] temp_names = tmp.zwroc_nazwy();
+                    String[] output_colnames = new String[temp_names.length + kluczowe_nazwy_kolumn.length];
 
-                         Class<? extends Value>[] temp_types = tmp.zwroc_typy();
-                         Class<? extends Value>[] output_types=new Class[temp_names.length+kluczowe_nazwy_kolumn.length];
+                    Class<? extends Value>[] temp_types = tmp.zwroc_typy();
+                    Class<? extends Value>[] output_types = new Class[temp_names.length + kluczowe_nazwy_kolumn.length];
 
-                         for (int k = 0; k < output_colnames.length ; k++) {
-                             output_colnames[k] =( k<kluczowe_nazwy_kolumn.length)? kluczowe_nazwy_kolumn[k]:
-                                                                    temp_names[k-kluczowe_nazwy_kolumn.length];
+                    for (int k = 0; k < output_colnames.length; k++) {
+                        output_colnames[k] = (k < kluczowe_nazwy_kolumn.length) ? kluczowe_nazwy_kolumn[k] : temp_names[k - kluczowe_nazwy_kolumn.length];
 
 
-                             output_types[k] =( k<kluczowe_nazwy_kolumn.length)? kluczowe_kolumny[k].typ:
-                                     temp_types[k-kluczowe_nazwy_kolumn.length];
+                        output_types[k] = (k < kluczowe_nazwy_kolumn.length) ? kluczowe_kolumny[k].typ : temp_types[k - kluczowe_nazwy_kolumn.length];
 
-                         }
-                         output= new DataFrame(output_colnames,output_types);
-                     }
+                    }
+                    output = new DataFrame(output_colnames, output_types);
+                }
 
-                     //perzisanie zawarotosci z temp jesli cos tam jest
-                     if(tmp.size()>0){
-                         Value output_row[] = new Value[output.iloscKolumn()];
-                         for (int i = 0; i <kluczowe_kolumny.length; i++) { //wpisanie identyfikatora wiersza
-                             output_row[i]=kluczowe_kolumny[i].zwrocObiekt(grupa);
-                         }
-                         for (int j = 0; j < tmp.size();j++) {
-                             Value[] tmp_row =tmp.zwrocWiersz(j);
-                             for (int k = 0; k < tmp.iloscKolumn(); k++) {
-                                 output_row[k + kluczowe_kolumny.length] = tmp_row[k];
-                             }
+                //perzisanie zawarotosci z temp jesli cos tam jest
+                if (tmp.size() > 0) {
+                    Value output_row[] = new Value[output.iloscKolumn()];
+                    for (int i = 0; i < kluczowe_kolumny.length; i++) { //wpisanie identyfikatora wiersza
+                        output_row[i] = kluczowe_kolumny[i].zwrocObiekt(grupa);
+                    }
+                    try {
+                        for (int j = 0; j < tmp.size(); j++) {
+                            Value[] tmp_row = tmp.zwrocWiersz(j);
+                            for (int k = 0; k < tmp.iloscKolumn(); k++) {
+                                output_row[k + kluczowe_kolumny.length] = tmp_row[k];
+                            }
 
-                             output.dodajElement(output_row);
-                         }
 
-                     }
+                            output.dodajElement(output_row);
 
-                     }
+
+                        }
+                    } catch (IncoherentTypeException | DifferentAmountOfColumns e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
 
             return output;
-             }
-
         }
 
-    public int iloscKolumn() {
-        return kolumny.length;
+    }
+    public Kolumna[] getKolumny(){
+        Kolumna[] output = new Kolumna[kolumny.length];
+        for (int i = 0; i < kolumny.length; i++) {
+            output[i]=kolumny[i];
+        }
+        return output;
     }
 
-
-    @Override
-    public String toString() {
-        StringBuilder s=new StringBuilder();
-        String[] str;
-        for(Kolumna k:kolumny){
-            str=k.typ.getTypeName().split("\\.");
-            s.append("|").append(k.nazwa).append(":").append(str[str.length-1]);
-        }
-        s.append("|\n");
-        for(int i=0;i<ilosc_wierszy;i++){
-            for(Kolumna k:kolumny)
-                s.append("|").append(k.zwrocObiekt(i).toString());
-            s.append("|\n");
-        }
-        return s.toString();
-    }
 
 }
 
