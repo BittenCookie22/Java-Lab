@@ -26,7 +26,7 @@ public class ApplyVar implements Applyable {
         try {
             if (df.ilosc_wierszy != 1) {
 
-                if (size > 0) {
+                //if (size > 0) {
                     String[] lista_nazw = mean.zwroc_nazwy();
 
                     for (int i = 0; i < output.iloscKolumn(); i++) {
@@ -44,8 +44,8 @@ public class ApplyVar implements Applyable {
                     output.dodajElement(var);
 
 
-                }
-                }else {
+                //}
+            }else {
                 for (int i = 0; i < var.length; i++) {
                     var[i] = new DoubleValue(0.0);
 

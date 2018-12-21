@@ -27,6 +27,8 @@ public class Kolumna {
         return this.nazwa;
     }
 
+    public Class<? extends Value>  getType(){return this.typ;}
+
     @Override
     public String toString() {
 
@@ -63,7 +65,7 @@ public class Kolumna {
 
 
 
-
+    @Deprecated
     public Kolumna doMathByUser(Value val) throws IncoherentTypeException {  //pozwala wybraz uzytkownikowi dzialanie do wykonania na kolumnie i value
         Kolumna output = new Kolumna(nazwa,NumericValue.class);
 
@@ -109,23 +111,130 @@ public class Kolumna {
             return output;
     }
 
+
+    public Kolumna doMathOperationWithValue(Value val,String operation) throws IncoherentTypeException, DivideByZeroException {
+        Kolumna output = new Kolumna(nazwa,NumericValue.class);
+        switch (operation){
+            case "add": for(Value i :dane) {output.dodaj(i.add(val));} return output;
+            case "mul": for(Value i :dane) {output.dodaj(i.mul(val));} return output;
+            case "sub": for(Value i :dane) {output.dodaj(i.sub(val));} return output;
+            case "pow": for(Value i :dane) {output.dodaj(new DoubleValue(((NumericValue)i).getValue().doubleValue()).pow(new DoubleValue(((NumericValue)val).getValue().doubleValue()))); } return output;
+            case "div": for(Value i :dane) {
+                if(((NumericValue) val).getValue().doubleValue()!=0){
+                    output.dodaj(new DoubleValue(((NumericValue) i).getValue().doubleValue()).div(new DoubleValue(((NumericValue) val).getValue().doubleValue())));}
+                else {throw new DivideByZeroException(val);}
+                }
+                return output;
+            default:
+                return this;
+        }
+    }
+
+
+    public Kolumna doMathOperationWithOtherColumn(Kolumna kol,String operation) throws DifferentSizeOfColumnsExcepiton, IncoherentTypeException {
+        if(this.dane.size()==kol.dane.size()){
+            Kolumna output = new Kolumna(nazwa, DoubleValue.class);
+            switch (operation){
+                case "add":for (int i = 0; i < dane.size(); i++) {output.dodaj(new DoubleValue(((NumericValue) this.dane.get(i).add(kol.dane.get(i))).getValue().doubleValue())); }
+                return output;
+                case "sub":for (int i = 0; i < dane.size(); i++) { output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).sub(kol.dane.get(i))).getValue().doubleValue())); }
+                    return output;
+                case "mul":for (int j = 0; j < dane.size(); j++) { output.dodaj(new DoubleValue (((NumericValue)this.dane.get(j).mul(kol.dane.get(j))).getValue().doubleValue())); }
+                    return output;
+                case "div":for (int i = 0; i < dane.size(); i++) { output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).div(kol.dane.get(i))).getValue().doubleValue())); }
+                    return output;
+                case "pow":for (int i = 0; i < dane.size(); i++) { output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).pow(kol.dane.get(i))).getValue().doubleValue())); }
+                    return output;
+                default:
+                    return this;
+            }
+        }
+        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
+    }
+
+
+    //-------------------------prev version -----------------
+
+    @Deprecated
+    public Kolumna addKol(Kolumna kol) throws IncoherentTypeException, DifferentSizeOfColumnsExcepiton {
+        if (this.dane.size() == kol.dane.size()) {
+            Kolumna output = new Kolumna(nazwa, DoubleValue.class);
+            for (int i = 0; i < dane.size(); i++) {
+                output.dodaj(new DoubleValue(((NumericValue) this.dane.get(i).add(kol.dane.get(i))).getValue().doubleValue()));
+            }
+            return output;
+        }
+        throw new DifferentSizeOfColumnsExcepiton(this.size(), kol.size());
+    }
+
+    @Deprecated
+    public Kolumna subKol(Kolumna kol) throws IncoherentTypeException, DifferentSizeOfColumnsExcepiton {
+        if(this.dane.size()==kol.dane.size()){
+            Kolumna output = new Kolumna(nazwa, DoubleValue.class);
+            for (int i = 0; i < dane.size(); i++) {
+                output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).sub(kol.dane.get(i))).getValue().doubleValue()));
+            }
+            return output;
+        }
+        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
+    }
+
+    @Deprecated
+    public Kolumna mulKol(Kolumna kol) throws IncoherentTypeException, DifferentSizeOfColumnsExcepiton {
+        if(this.dane.size()==kol.dane.size()){
+            Kolumna output = new Kolumna(nazwa, DoubleValue.class);
+            for (int j = 0; j < dane.size(); j++) {
+                output.dodaj(new DoubleValue (((NumericValue)this.dane.get(j).mul(kol.dane.get(j))).getValue().doubleValue()));
+            }
+            return output;
+        }
+        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
+    }
+
+    @Deprecated
+    public Kolumna divKol(Kolumna kol) throws IncoherentTypeException,DifferentSizeOfColumnsExcepiton {
+        if(this.dane.size()==kol.dane.size()){
+            Kolumna output = new Kolumna(nazwa, DoubleValue.class);
+            for (int i = 0; i < dane.size(); i++) {
+                output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).div(kol.dane.get(i))).getValue().doubleValue()));
+            }
+            return output;
+        }
+        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
+    }
+
+    @Deprecated
+    public Kolumna powKol(Kolumna kol) throws IncoherentTypeException, DifferentSizeOfColumnsExcepiton {
+        if(this.dane.size()==kol.dane.size()){
+            Kolumna output = new Kolumna(nazwa, DoubleValue.class);
+            for (int i = 0; i < dane.size(); i++) {
+                output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).pow(kol.dane.get(i))).getValue().doubleValue()));
+            }
+            return output;
+
+        }
+        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
+    }
+
+    @Deprecated
     public Kolumna add(Value val) throws IncoherentTypeException {
-            Kolumna output = new Kolumna(nazwa,NumericValue.class);
-            for(Value i :dane) {
-                    output.dodaj(i.add(val));
-
-            }
-            return output;
+        Kolumna output = new Kolumna(nazwa,NumericValue.class);
+        for(Value i :dane) {
+            output.dodaj(i.add(val));
+        }
+        return output;
     }
 
+    @Deprecated
     public Kolumna sub(Value val) throws IncoherentTypeException {
-            Kolumna output = new Kolumna(nazwa,typ);
-            for(Value i :dane) {
-                    output.dodaj(i.sub(val));
-            }
-            return output;
+        Kolumna output = new Kolumna(nazwa,typ);
+        for(Value i :dane) {
+            output.dodaj(i.sub(val));
+        }
+        return output;
     }
 
+    @Deprecated
     public Kolumna mul(Value val) throws IncoherentTypeException {
         Kolumna output = new Kolumna(nazwa, typ);
         for (Value i : dane) {
@@ -134,86 +243,28 @@ public class Kolumna {
         return output;
     }
 
+    @Deprecated
     public Kolumna div(Value val) throws IncoherentTypeException, DivideByZeroException {
-            Kolumna output = new Kolumna(nazwa, DoubleValue.class);
-            for (Value i : dane) {
-                if(((NumericValue) val).getValue().doubleValue()!=0){
-                    output.dodaj(new DoubleValue(((NumericValue) i).getValue().doubleValue()).div(new DoubleValue(((NumericValue) val).getValue().doubleValue())));}
-                else {throw new DivideByZeroException(val);
-                }
+        Kolumna output = new Kolumna(nazwa, DoubleValue.class);
+        for (Value i : dane) {
+            if(((NumericValue) val).getValue().doubleValue()!=0){
+                output.dodaj(new DoubleValue(((NumericValue) i).getValue().doubleValue()).div(new DoubleValue(((NumericValue) val).getValue().doubleValue())));}
+            else {throw new DivideByZeroException(val);
+            }
         }
         return output;
     }
 
+    @Deprecated
     public Kolumna pow(Value val) throws IncoherentTypeException {
-            Kolumna output = new Kolumna(nazwa,DoubleValue.class);
-            for(Value i :dane) {
+        Kolumna output = new Kolumna(nazwa,DoubleValue.class);
+        for(Value i :dane) {
 
-                    output.dodaj  (new DoubleValue(((NumericValue)i).getValue().doubleValue()).pow(new DoubleValue(((NumericValue)val).getValue().doubleValue())));
-
-            }
-            return output;
-        }
-
-
-
-    public Kolumna addKol(Kolumna kol) throws IncoherentTypeException, DifferentSizeOfColumnsExcepiton {
-        if(this.dane.size()==kol.dane.size()){
-                Kolumna output = new Kolumna(nazwa, DoubleValue.class);
-                for (int i = 0; i < dane.size(); i++) {
-                    output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).add(kol.dane.get(i))).getValue().doubleValue()));
-                }
-                return output;
-            }
-
-        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
-    }
-
-    public Kolumna subKol(Kolumna kol) throws IncoherentTypeException, DifferentSizeOfColumnsExcepiton {
-        if(this.dane.size()==kol.dane.size()){
-                Kolumna output = new Kolumna(nazwa, DoubleValue.class);
-                for (int i = 0; i < dane.size(); i++) {
-                    output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).sub(kol.dane.get(i))).getValue().doubleValue()));
-                }
-                return output;
-        }
-        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
-    }
-
-    public Kolumna mulKol(Kolumna kol) throws IncoherentTypeException, DifferentSizeOfColumnsExcepiton {
-        if(this.dane.size()==kol.dane.size()){
-                Kolumna output = new Kolumna(nazwa, DoubleValue.class);
-                for (int j = 0; j < dane.size(); j++) {
-                    output.dodaj(new DoubleValue (((NumericValue)this.dane.get(j).mul(kol.dane.get(j))).getValue().doubleValue()));
-                }
-                return output;
-        }
-        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
-    }
-
-    public Kolumna divKol(Kolumna kol) throws IncoherentTypeException,DifferentSizeOfColumnsExcepiton {
-        if(this.dane.size()==kol.dane.size()){
-                Kolumna output = new Kolumna(nazwa, DoubleValue.class);
-                for (int i = 0; i < dane.size(); i++) {
-                    output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).div(kol.dane.get(i))).getValue().doubleValue()));
-                }
-                return output;
-        }
-        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
-    }
-
-    public Kolumna powKol(Kolumna kol) throws IncoherentTypeException, DifferentSizeOfColumnsExcepiton {
-        if(this.dane.size()==kol.dane.size()){
-                Kolumna output = new Kolumna(nazwa, DoubleValue.class);
-                for (int i = 0; i < dane.size(); i++) {
-                    output.dodaj(new DoubleValue (((NumericValue)this.dane.get(i).pow(kol.dane.get(i))).getValue().doubleValue()));
-                }
-                return output;
+            output.dodaj  (new DoubleValue(((NumericValue)i).getValue().doubleValue()).pow(new DoubleValue(((NumericValue)val).getValue().doubleValue())));
 
         }
-        throw new DifferentSizeOfColumnsExcepiton(this.size(),kol.size());
+        return output;
     }
-
 //    @Override
 //    public String toString() {
 //

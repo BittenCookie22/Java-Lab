@@ -127,8 +127,7 @@ public class DataFrame {
         StringBuilder s = new StringBuilder();
         String[] str;
         for (Kolumna k : kolumny) {
-            str = k.typ.getTypeName().split("\\.");
-            s.append("|").append(k.nazwa).append(":").append(str[str.length - 1]);
+            s.append("|").append(k.nazwa).append(":").append(k.getType().getSimpleName());
         }
         s.append("|\n");
         for (int i = 0; i < ilosc_wierszy; i++) {
@@ -149,7 +148,7 @@ public class DataFrame {
                 return i;
             }
         }
-        throw new NoSuchElementException("Nie ma takiej kolumny" + colname + "w tej Ramce Danych");
+        throw new NoSuchElementException("Nie ma takiej kolumny " + colname + " w tej Ramce Danych");
 
     }
 
@@ -293,7 +292,7 @@ public class DataFrame {
 
     /// -----------group by -----------
 
-    public TreeMap<Value, DataFrame> groupBy(String colname) {
+    protected TreeMap<Value, DataFrame> groupByOne(String colname) {
         Kolumna kol = get(colname);
         TreeMap<Value, DataFrame> output = new TreeMap<>();
         try {
@@ -320,10 +319,10 @@ public class DataFrame {
         return output;
     }
 
-    public Grupator groupBy(String[] colname) throws ZeroLengthException, NoSenseInGroupingByAllColumnsException {
+    public GroupBy groupBy(String... colname) throws ZeroLengthException, NoSenseInGroupingByAllColumnsException {
         if(colname.length==this.kolumny.length){throw new NoSenseInGroupingByAllColumnsException();
         }
-        TreeMap<Value, DataFrame> initial = groupBy(colname[0]);
+        TreeMap<Value, DataFrame> initial = groupByOne(colname[0]);
 
         LinkedList<DataFrame> lista;
 
@@ -335,7 +334,7 @@ public class DataFrame {
         for (int i = 1; i < colname.length; i++) {
             lista.clear();
             for (DataFrame df : temp)
-                lista.addAll(df.groupBy(colname[i]).values());
+                lista.addAll(df.groupByOne(colname[i]).values());
             temp.clear();
             temp.addAll(lista);
         }
@@ -447,6 +446,8 @@ public class DataFrame {
         }
 
     }
+
+    @Deprecated
     public Kolumna[] getKolumny(){
         Kolumna[] output = new Kolumna[kolumny.length];
         for (int i = 0; i < kolumny.length; i++) {

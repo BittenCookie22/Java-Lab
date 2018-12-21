@@ -1,34 +1,31 @@
 package DF;
 
-import DF.Exceptions.IncoherentTypeException;
-import DF.Exceptions.NoSenseInGroupingByAllColumnsException;
-import DF.Exceptions.ValueParseException;
-import DF.Exceptions.ZeroLengthException;
-import DF.Values.IntegerValue;
-import DF.Values.StringValue;
+import DF.Exceptions.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class Main {
-    public static void main (String[] args) throws IOException, ValueParseException, ZeroLengthException, NoSenseInGroupingByAllColumnsException {
-//        DataFrame tmp = new DataFrame(new String[]{"z","g","r"}, new Class[] {IntegerValue.class,IntegerValue.class,IntegerValue.class} );
-//        tmp.addRecord(new IntegerValue(9),new IntegerValue(23),new IntegerValue(33));
-//        tmp.addRecord(new IntegerValue(11),new IntegerValue(44),new IntegerValue(55));
+    public static void main (String[] args) throws IOException, ValueParseException, ZeroLengthException, NoSenseInGroupingByAllColumnsException, IncoherentTypeException, DifferentAmountOfColumns, SQLException, DivideByZeroException, DifferentSizeOfColumnsExcepiton {
+//      DataFrame tmp = new DataFrame(new String[]{"z","g","r"}, new Class[] {IntegerValue.class,IntegerValue.class,IntegerValue.class} );
+//       tmp.dodajElement(new IntegerValue(9),new IntegerValue(23),new IntegerValue(33));
+//        System.out.println(tmp.get("z").getType());
+////        tmp.addRecord(new IntegerValue(11),new IntegerValue(44),new IntegerValue(55));
+////
+////       System.out.println(tmp.ilosc_wierszy);
+////        System.out.println(tmp.get("g"));
+////        System.out.println(tmp.toString());
+
 //
-//       System.out.println(tmp.ilosc_wierszy);
-//        System.out.println(tmp.get("g"));
-//        System.out.println(tmp.toString());
-
-
-       //  TEST DLA JEDNEGO KLUCZA
-        try {
-            DataFrame tmp2 = new DataFrame("C:\\Users\\Joanna\\Desktop\\test.csv", new Class[]{ StringValue.class, IntegerValue.class, IntegerValue.class});
-           // System.out.println(tmp2.toString());
-            DataFrame.Grupator group = tmp2.groupBy(new String[]{"id"});
-            System.out.println(group.std());
-        } catch (IncoherentTypeException e) {
-            e.printStackTrace();
-        }
+//       //  TEST DLA JEDNEGO KLUCZA
+//        try {
+//            DataFrame tmp2 = new DataFrame("C:\\Users\\Joanna\\Desktop\\test.csv", new Class[]{ StringValue.class, IntegerValue.class, IntegerValue.class});
+//           // System.out.println(tmp2.toString());
+//            DataFrame.Grupator group = tmp2.groupBy(new String[]{"id"});
+//            System.out.println(group.std());
+//        } catch (IncoherentTypeException e) {
+//            e.printStackTrace();
+//        }
 
 //      //  DataFrame tmp4 = new DataFrame("tg.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
 //
@@ -46,14 +43,14 @@ public class Main {
 
         // TEST DLA DWÓCH KLUCZY
 
-          //DataFrame tmp3 = new DataFrame("groubymulti.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
+       // DataFrame tmp3 = new DataFrame("groubymulti.csv", new Class[]{StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
 
-         //DataFrame.Grupator group1 = tmp3.groupBy(new String []{"id","date"});
+      //   DataFrame.Grupator group1 = tmp3.groupBy(new String []{"id","date"});
         // System.out.println(group1.min());
         //System.out.println(group1.max());
         // System.out.println(group1.sum());
         // System.out.println(group1.mean());
-        // System.out.println(group1.var());
+         //System.out.println(group1.var());
         // System.out.println(group1.std());
 
 
@@ -136,12 +133,21 @@ public class Main {
 //        }
 //
 //
-////        Kolumna test2 = new Kolumna ("nazwaa",IntegerValue.class);
-////
-////        test2.dodaj(new IntegerValue(1));
-////        test2.dodaj(new IntegerValue(2));
-////        test2.dodaj(new IntegerValue(3));
-////        test2.dodaj(new IntegerValue(4));
+//        Kolumna test3 = new Kolumna ("nazwaa",IntegerValue.class);
+//
+//        test3.dodaj(new IntegerValue(1));
+//        test3.dodaj(new IntegerValue(2));
+//        test3.dodaj(new IntegerValue(3));
+//        test3.dodaj(new IntegerValue(4));
+//
+//        Kolumna test2 = new Kolumna ("nazwaaaaa",IntegerValue.class);
+//
+//        test2.dodaj(new IntegerValue(1));
+//        test2.dodaj(new IntegerValue(2));
+//        test2.dodaj(new IntegerValue(3));
+//        test2.dodaj(new IntegerValue(4));
+//        Kolumna test22= test2.doMathOperationWithOtherColumn(test3,"mul");
+//        System.out.println(test22.toString());
 ////
 //////
 ////       // Kolumna test11= test1.doMathByUser(new StringValue("s"));
@@ -173,6 +179,47 @@ public class Main {
 //            System.out.println("problemik");
 //        }
 //        System.out.println(output.toString());
+
+        //---------- testy dla Data Frame DB------------
+
+     //   DataFrameDB tmp = new  DataFrameDB.DataFrameBDBuilder("jdbc:mysql://mysql.agh.edu.pl/joannabi",
+     //           "joannabi","87cz4zfRV047S5Wr","TABLE3").build();
+
+//        DataFrameDB tmp = new  DataFrameDB.DataFrameBDBuilder("jdbc:mysql://mysql.agh.edu.pl/joannabi",
+//                "joannabi","87cz4zfRV047S5Wr","books").build();
+//
+//        System.out.println(Arrays.toString(tmp.zwrocWiersz(1)));
+//        System.out.println(tmp.size());
+//
+//
+//        System.out.println(tmp.get("title"));
+//        DataFrame test = tmp.fromDataFrameDFtoDataFrame();
+//        System.out.println(test.toString());
+      //  GroupBy grp=tmp.groupBy("id");
+       // System.out.println(grp.apply(new ApplyMax()));
+       // tmp.dodajElement(new StringValue("0101010101"),new StringValue("test tytul"),new StringValue("test autor"),new IntegerValue(2000));
+     //   System.out.println(tmp.toString());
+
+
+      // -----porównanie czasów dla max -------
+
+//        System.out.println("DataFrame DB:");
+//        long start = System.currentTimeMillis();
+//        grp.apply(new ApplyMax());
+//        long stop = System.currentTimeMillis();
+//        System.out.println(stop-start);
+//
+//        DataFrame tmp2 = new DataFrame("TABLE3.csv", new Class[]{ StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
+//        GroupBy group = tmp2.groupBy(new String[]{"id"});
+//        long start2 = System.currentTimeMillis();
+//        group.max();
+//        long stop2 = System.currentTimeMillis();
+//
+//        System.out.println("DataFrame :");
+//        System.out.println(stop2-start2);
+
+        
+
 
     }
 
