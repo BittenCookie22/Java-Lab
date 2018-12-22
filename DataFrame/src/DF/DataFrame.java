@@ -211,7 +211,7 @@ public class DataFrame {
 //płytka -> nowy obiekt ale wskazujacy na ten sam adres w pamięci, zmiana w obj1 powoduje zmiane w obj2
 
 
-//---------------czytanie z pliku-----------------------
+//---------------czytanie z pliku----------------------
 
     public void readingFromFileFunction(String path, boolean header) throws IOException, IncoherentTypeException, ValueParseException {
 
