@@ -47,6 +47,12 @@ public class Kolumna {
 
     }
 
+    Kolumna copy(){
+        Kolumna nowa = new Kolumna(nazwa,typ);
+        nowa.dane=dane;
+        return nowa;
+    }
+
     public int size(){
         return dane.size();
     }

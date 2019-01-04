@@ -6,13 +6,10 @@ import DF.Values.Value;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import java.util.TreeMap;
+import java.util.*;
 
 public class DataFrame {
-     Kolumna[] kolumny;
+    Kolumna[] kolumny;
     int ilosc_wierszy;
     public String[] lista_nazw;
     Class<? extends Value>[] lista_typow;
@@ -215,7 +212,7 @@ public class DataFrame {
 
     public void readingFromFileFunction(String path, boolean header) throws IOException, IncoherentTypeException, ValueParseException {
 
-        try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             // Open the file
 
             String[] strLine;
@@ -238,7 +235,7 @@ public class DataFrame {
                     try {
                         wartosciZpliku[m] = (kolumny[m].typ).newInstance().create(wartoscWpostaciStringa);
                     } catch (Exception e) {
-                        throw new ValueParseException(size(),kolumny[m].getNazwa());
+                        throw new ValueParseException(size(), kolumny[m].getNazwa());
                     }
 
 
@@ -319,8 +316,10 @@ public class DataFrame {
         return output;
     }
 
+    //    @Deprecated
     public GroupBy groupBy(String... colname) throws ZeroLengthException, NoSenseInGroupingByAllColumnsException {
-        if(colname.length==this.kolumny.length){throw new NoSenseInGroupingByAllColumnsException();
+        if (colname.length == this.kolumny.length) {
+            throw new NoSenseInGroupingByAllColumnsException();
         }
         TreeMap<Value, DataFrame> initial = groupByOne(colname[0]);
 
@@ -342,6 +341,54 @@ public class DataFrame {
         return new Grupator(lista, colname);
 
     }
+
+
+    protected class ValueGroup implements Comparable<ValueGroup> {
+        private Value[] id;
+
+        @Override
+        public String toString() {
+            return Arrays.toString(id);
+        }
+
+        protected ValueGroup(Value[] key) {
+            id = key;
+        }
+
+        public Value[] getId() {
+            return id;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof ValueGroup) {
+                ValueGroup other = (ValueGroup) o;
+
+                return Arrays.deepEquals(id, other.id);
+            } else return false;
+        }
+
+        @Override
+        public int hashCode() {
+
+            return Arrays.deepHashCode(id);
+        }
+
+        @Override
+        public int compareTo(ValueGroup valueGroup) {
+            for (int i = 0; i < id.length; i++) {
+                if (id[i].equals(valueGroup.id[i])) continue;
+                try {
+                    if (id[i].lte(valueGroup.id[i])) return -1;
+                    else return 1;
+                } catch (IncoherentTypeException e) {
+                    e.printStackTrace();
+                }
+            }
+            return 0;
+        }
+    }
+
 
 
     public class  Grupator implements GroupBy {
@@ -447,14 +494,19 @@ public class DataFrame {
 
     }
 
-    @Deprecated
-    public Kolumna[] getKolumny(){
-        Kolumna[] output = new Kolumna[kolumny.length];
-        for (int i = 0; i < kolumny.length; i++) {
-            output[i]=kolumny[i];
+
+        @Deprecated
+        public Kolumna[] getKolumny() {
+            Kolumna[] output = new Kolumna[kolumny.length];
+            for (int i = 0; i < kolumny.length; i++) {
+                output[i] = kolumny[i];
+            }
+            return output;
         }
-        return output;
-    }
+
+
+
+
 
 
 }
