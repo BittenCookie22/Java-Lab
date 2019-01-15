@@ -206,15 +206,16 @@ public class Main {
         // -----porównanie czasów dla max -------
 
         DataFrameDB tmp = new  DataFrameDB.DataFrameBDBuilder("jdbc:mysql://mysql.agh.edu.pl/joannabi",
-                "joannabi","87cz4zfRV047S5Wr","TABLE3").build();
+                "joannabi","87cz4zfRV047S5Wr","table600k").build();
 
-        GroupBy grp=tmp.groupBy("id");
+       // GroupBy grp=tmp.groupBy("id");
 
 
 
         System.out.println("DataFrame DB:");
         long start = System.currentTimeMillis();
-        grp.apply(new ApplyMax());
+       // grp.apply(new ApplyMean());
+        GroupBy grp=tmp.groupBy("id");
         long stop = System.currentTimeMillis();
         System.out.println(stop-start);
 
@@ -222,10 +223,10 @@ public class Main {
 
 
         DataFrame tmp2 = new DataFrame("table600k.csv", new Class[]{ StringValue.class,DateTimeValue.class,DoubleValue.class,DoubleValue.class});
-        GroupBy group = tmp2.groupBy(new String[]{"id"});
+        //GroupBy group = tmp2.groupBy(new String[]{"id"});
         long start2 = System.currentTimeMillis();
-
-        group.std();
+        GroupBy group = tmp2.groupBy(new String[]{"id"});
+        //group.mean();
         long stop2 = System.currentTimeMillis();
 
         System.out.println("DataFrame :");
@@ -235,10 +236,10 @@ public class Main {
         ExecutorService threadPool = newFixedThreadPool(4);
         ThreadDataFrame threadDF = new ThreadDataFrame(threadPool,tmp2);
 
-        GroupBy groupThread = threadDF.groupBy(new String[]{"id"});
+        //GroupBy groupThread = threadDF.groupBy(new String[]{"id"});
         long start3 = System.currentTimeMillis();
-
-        groupThread.std();
+        GroupBy groupThread = threadDF.groupBy(new String[]{"id"});
+        //groupThread.mean() ;
         long stop3 = System.currentTimeMillis();
         threadPool.shutdown();
 
