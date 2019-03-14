@@ -94,23 +94,6 @@ Klasa DataFrameDB:
 
 
 
-
-Do wykonania:
-
-*Zmodyfikuj DataFrame, tak aby obliczenia, które można zrównoleglić były zrównoleglone.
-*Zrób testy rozwiązania: zwykłego, z bazą danych i wielowątkowego. Zapisz wyniki w formacie CSV a następnie użyj swojego GUI do wizualizowania wyników
-*Poza metodami, których zrównoleglenie zależeć będzie od przybranej strategii implementacji, warunkiem koniecznym do zaliczenia zadania jest implementacja równoległego grupby wraz z operacjami: operacja dla każdej grupy liczona jest w osobnym wątku.
-
-*Zmodyfikuj projekt w taki sposób, aby operacje groupby i inne możilwe były wykonywane na osobnych maszynach:
-Konieczne będzie napisanie dwóch nowych komponentów:
--serwera pośredniczącego, który będzie nawiązywał połączenie i pośredniczył w 		wymianie danych
--serwerów obliczeniowych, które będą podłączać się do serwera głównego i dzięki temu ten będzie wiedział ile ma węzłów obliczeniowych. Powinny one wykorzystywać DataFrame do wykonywania obliczeń (zrównoleglonych)
--klientów (czyli naszych DataFrame), które będą łączyć się z serwerem pośredniczącym, i będą wysyłać mu żądanie operacji, wraz z porcja danych do obsłużenia.
-*Wykonaj testy wszystkich rozwiązań na poniższych danych i przedstaw wyniki w formie wykresów (nie musi to być GUI – może byc Python, Excel, Matlab):
-Zbiory danych do testów: TBA
-
 Link do strony z laboratoriami, w każdym laboratorium znajduje się opis kolejnych części projektu:
 http://home.agh.edu.pl/~sbobek/old/doku.php?id=progob
 
-Link do mojego githuba na którym znajduje się projket:
-https://github.com/BittenCookie22/Java-Lab/tree/second/DataFrame/src/DF
